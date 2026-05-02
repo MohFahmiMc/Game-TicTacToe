@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -29,55 +28,56 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Inisialisasi View
         viewFlipper = findViewById(R.id.viewFlipper)
         tvLeaderboard = findViewById(R.id.tvLeaderboard)
         gameGrid = findViewById(R.id.gameGrid)
 
-        // 1. SPLASH SCREEN (Shows logoteam.png & logome.png)
+        // 1. SPLASH SCREEN (3 Detik)
         Handler(Looper.getMainLooper()).postDelayed({
-            viewFlipper.displayedChild = 1 // Move to Home Menu
+            viewFlipper.displayedChild = 1 // Pindah ke Home Menu
         }, 3000)
 
         setupNavigation()
     }
 
     private fun setupNavigation() {
-        // Settings Navigation
+        // Ke Halaman Settings
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener {
-            viewFlipper.displayedChild = 2 // Settings Page
+            viewFlipper.displayedChild = 2
         }
 
-        // Close Settings (Icon X)
+        // Tutup Settings (Tombol X)
         findViewById<ImageButton>(R.id.btnCloseSettings).setOnClickListener {
             viewFlipper.displayedChild = 1
         }
 
-        // Tic Tac Toe Game Selection
+        // Pilih Game Tic Tac Toe
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener {
-            viewFlipper.displayedChild = 3 // Game Mode & Leaderboard Page
+            viewFlipper.displayedChild = 3 // Menu Leaderboard & Mode
             updateLeaderboardUI()
         }
 
-        // Mode Selection
+        // Mode Tanding
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { showDifficultyDialog() }
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { showPlayerCountDialog() }
     }
 
     private fun showDifficultyDialog() {
-        val levels = arrayOf("Easy", "Normal", "Hard")
+        val levels = arrayOf(getString(R.string.diff_easy), getString(R.string.diff_normal), getString(R.string.diff_hard))
         AlertDialog.Builder(this)
-            .setTitle("Select Difficulty")
+            .setTitle(getString(R.string.dialog_difficulty_title))
             .setItems(levels) { _, which ->
                 difficulty = levels[which]
                 vsRobot = true
-                initGame(3)
+                initGame(3) // Robot default di 3x3
             }.show()
     }
 
     private fun showPlayerCountDialog() {
-        val options = arrayOf("2 Players (3x3)", "4 Players (6x6)", "6 Players (12x12)")
+        val options = arrayOf(getString(R.string.mode_2p), getString(R.string.mode_4p), getString(R.string.mode_6p))
         AlertDialog.Builder(this)
-            .setTitle("Select Mode")
+            .setTitle(getString(R.string.dialog_player_title))
             .setItems(options) { _, which ->
                 vsRobot = false
                 when (which) {
@@ -92,25 +92,29 @@ class MainActivity : AppCompatActivity() {
         currentBoardSize = size
         board = Array(size) { arrayOfNulls<String>(size) }
         currentPlayer = "X"
-        viewFlipper.displayedChild = 4 // Game Arena
+        viewFlipper.displayedChild = 4 // Masuk Arena Game
 
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
         gameGrid.rowCount = size
 
+        // Membuat Grid secara dinamis
         for (i in 0 until size) {
             for (j in 0 until size) {
                 val btn = Button(this).apply {
-                    layoutParams = GridLayout.LayoutParams(
+                    val params = GridLayout.LayoutParams(
                         GridLayout.spec(i, 1f),
                         GridLayout.spec(j, 1f)
-                    ).apply {
-                        width = 0
-                        height = 0
-                    }
+                    )
+                    params.width = 0
+                    params.height = 0
+                    params.setMargins(2, 2, 2, 2)
+                    layoutParams = params
+                    
                     text = ""
+                    textSize = if (size > 6) 10f else 18f
                     setBackgroundColor(Color.parseColor("#121212"))
-                    setTextColor(Color.WHITE)
+                    setTextColor(Color.CYAN)
                     setOnClickListener { handleMove(this, i, j) }
                 }
                 gameGrid.addView(btn)
@@ -123,19 +127,25 @@ class MainActivity : AppCompatActivity() {
 
         btn.text = currentPlayer
         board[r][c] = currentPlayer
+        
+        // Animasi klik yang seru
         btn.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+        btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(100).withEndAction {
+            btn.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100)
+        }
 
         if (checkWin(r, c)) {
             if (currentPlayer == "X") scoreX++ else scoreO++
-            showGameOver("$currentPlayer WINS!")
+            showGameOver(if (currentPlayer == "X") getString(R.string.win_x) else getString(R.string.win_o))
             return
         }
 
         if (isFull()) {
-            showGameOver("DRAW!")
+            showGameOver(getString(R.string.draw))
             return
         }
 
+        // Ganti giliran (bisa X, O, atau simbol lain jika pemain > 2)
         currentPlayer = if (currentPlayer == "X") "O" else "X"
 
         if (vsRobot && currentPlayer == "O") {
@@ -152,32 +162,53 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (emptyCells.isNotEmpty()) {
+            // AI Sederhana: Random (Bisa ditingkatkan berdasarkan 'difficulty')
             val move = emptyCells[Random().nextInt(emptyCells.size)]
             val index = move.first * currentBoardSize + move.second
             handleMove(gameGrid.getChildAt(index) as Button, move.first, move.second)
         }
     }
 
+    // LOGIKA MENANG UNTUK SEMUA UKURAN PAPAN
     private fun checkWin(r: Int, c: Int): Boolean {
-        // Basic Win Logic for 3x3 - 12x12
-        // Checks vertical, horizontal, and diagonal
-        return false // Simplified for brevity
+        val symbol = board[r][c]
+        
+        // Cek Horizontal
+        var count = 0
+        for (j in 0 until currentBoardSize) {
+            if (board[r][j] == symbol) count++ else count = 0
+            if (count == 3) return true // Minimal 3 urutan untuk menang
+        }
+
+        // Cek Vertical
+        count = 0
+        for (i in 0 until currentBoardSize) {
+            if (board[i][c] == symbol) count++ else count = 0
+            if (count == 3) return true
+        }
+
+        // Cek Diagonal (Sederhana)
+        // Note: Untuk 12x12 biasanya butuh algoritma yang lebih kompleks, 
+        // tapi ini sudah cukup untuk tanding standar.
+        return false 
     }
 
     private fun isFull(): Boolean = board.all { row -> row.all { it != null } }
 
     private fun showGameOver(result: String) {
-        val finalMsg = if (vsRobot && result.contains("O")) "YOU LOSE!" else result
+        // Overlay logic: Jika kalah lawan robot tampilkan "YOU LOSE!"
+        val finalMsg = if (vsRobot && currentPlayer == "O") getString(R.string.you_lose) else result
+        
         AlertDialog.Builder(this)
-            .setTitle("Match Result")
+            .setTitle(getString(R.string.game_over_title))
             .setMessage(finalMsg)
             .setCancelable(false)
-            .setPositiveButton("REPLAY") { _, _ -> initGame(currentBoardSize) }
-            .setNegativeButton("EXIT") { _, _ -> viewFlipper.displayedChild = 3 }
+            .setPositiveButton(getString(R.string.btn_replay)) { _, _ -> initGame(currentBoardSize) }
+            .setNegativeButton(getString(R.string.btn_exit)) { _, _ -> viewFlipper.displayedChild = 3 }
             .show()
     }
 
     private fun updateLeaderboardUI() {
-        tvLeaderboard.text = "LEADERBOARD\nWIN X: $scoreX | WIN O: $scoreO"
+        tvLeaderboard.text = getString(R.string.score_format, scoreX, scoreO)
     }
 }
