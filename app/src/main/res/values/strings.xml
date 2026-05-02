@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tic Tac Toe Scarily</string>
+
+    <string name="btn_start">START GAME</string>
+    <string name="btn_play_now">PLAY NOW</string>
+    <string name="btn_settings">SETTINGS</string>
+    <string name="btn_back">BACK</string>
+    <string name="btn_exit">EXIT</string>
+    <string name="btn_continue">CONTINUE</string>
+    <string name="btn_replay">REPLAY</string>
+
+    <string name="settings_title">SETTINGS</string>
+    <string name="settings_developer">Developer: MohFahmiMc</string>
+    <string name="settings_github">GitHub: github.com/MohFahmiMc</string>
+    <string name="settings_theme">Change Theme</string>
+    <string name="settings_language">Language: English</string>
+
+    <string name="game_title">TIC TAC TOE</string>
+    <string name="mode_vs_robot">VS ROBOT</string>
+    <string name="mode_vs_friends">VS FRIENDS</string>
+    <string name="leaderboard_title">LEADERBOARD</string>
+    <string name="score_format">WIN X: %1$d | WIN O: %2$d</string>
+
+    <string name="dialog_difficulty_title">Select Difficulty</string>
+    <string name="diff_easy">Easy</string>
+    <string name="diff_normal">Normal</string>
+    <string name="diff_hard">Hard</string>
+    
+    <string name="dialog_player_title">Select Mode</string>
+    <string name="mode_2p">2 Players (3x3)</string>
+    <string name="mode_4p">4 Players (6x6)</string>
+    <string name="mode_6p">6 Players (12x12)</string>
+
+    <string name="game_over_title">Match Result</string>
+    <string name="win_x">X WINS!</string>
+    <string name="win_o">O WINS!</string>
+    <string name="draw">DRAW!</string>
+    <string name="you_lose">YOU LOSE!</string>
+    <string name="you_win">YOU WIN!</string>
+</resources>
+      
