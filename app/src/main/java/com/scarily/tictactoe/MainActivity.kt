@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Inisialisasi View
         viewFlipper = findViewById(R.id.viewFlipper)
         tvTurnStatus = findViewById(R.id.tvTurnStatus)
         gameGrid = findViewById(R.id.gameGrid)
@@ -47,11 +48,15 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.score_p5), findViewById(R.id.score_p6)
         )
 
+        loadScores()
+        startSplashScreen()
+        setupNavigation()
+    }
+
+    private fun startSplashScreen() {
         val imgTeam = findViewById<ImageView>(R.id.imgLogoTeam)
         val imgMe = findViewById<ImageView>(R.id.imgLogoMe)
-
-        loadScores()
-
+        
         splashLayout.setBackgroundColor(Color.WHITE)
         imgTeam.alpha = 0f
         imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
@@ -62,44 +67,50 @@ class MainActivity : AppCompatActivity() {
                 imgMe.alpha = 0f
                 imgMe.animate().alpha(1f).setDuration(1000).withEndAction {
                     Handler(Looper.getMainLooper()).postDelayed({
-                        viewFlipper.displayedChild = 1 
+                        viewFlipper.displayedChild = 1 // Masuk ke Home
                     }, 1000)
                 }.start()
             }, 1000)
         }.start()
-
-        setupNavigation()
     }
 
     private fun setupNavigation() {
-        findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { viewFlipper.displayedChild = 3 }
+        // Navigasi Utama
+        findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { 
+            viewFlipper.displayedChild = 3 // Pergi ke PILIH MODE
+        }
+        
         findViewById<Button>(R.id.btnExitApp).setOnClickListener { finishAffinity() }
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { viewFlipper.displayedChild = 2 }
         findViewById<Button>(R.id.btnCloseSettings).setOnClickListener { viewFlipper.displayedChild = 1 }
 
+        // Social Media
         findViewById<ImageButton>(R.id.btnGithub).setOnClickListener { openUrl("https://github.com/MohFahmiMc") }
         findViewById<ImageButton>(R.id.btnWeb).setOnClickListener { openUrl("https://mifahmi.vercel.app/") }
 
+        // LOGIKA PEMILIHAN MODE (DI HALAMAN CHILD 3)
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
             vsRobot = true
             totalPlayers = 2
-            initGame(3) 
+            initGame(3) // Robot selalu 3x3
         }
 
-        findViewById<Button>(R.id.btnModeFriends).setOnClickListener { showPlayerCountOverlay() }
+        findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
+            vsRobot = false
+            showPlayerCountOverlay() // Panggil overlay pemilihan jumlah pemain
+        }
 
+        // Kontrol Game
         findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
             for (i in 0..5) playerScores[i] = 0
             saveScores()
             updateLeaderboardUI()
             Toast.makeText(this, "Skor direset!", Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnExitGame).setOnClickListener { viewFlipper.displayedChild = 1 }
-    }
-
-    private fun openUrl(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        startActivity(intent)
+        
+        findViewById<Button>(R.id.btnExitGame).setOnClickListener { 
+            viewFlipper.displayedChild = 1 
+        }
     }
 
     private fun showPlayerCountOverlay() {
@@ -107,23 +118,21 @@ class MainActivity : AppCompatActivity() {
         dialogOverlay.visibility = View.VISIBLE
         dialogOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
 
+        // Set Click Listener di dalam overlay agar tidak tumpang tindih
         findViewById<Button>(R.id.btnOpt2).setOnClickListener {
             dialogOverlay.visibility = View.GONE
-            vsRobot = false
             totalPlayers = 2
             initGame(3)
         }
 
         findViewById<Button>(R.id.btnOpt4).setOnClickListener {
             dialogOverlay.visibility = View.GONE
-            vsRobot = false
             totalPlayers = 4
             initGame(6)
         }
 
         findViewById<Button>(R.id.btnOpt6).setOnClickListener {
             dialogOverlay.visibility = View.GONE
-            vsRobot = false
             totalPlayers = 6
             initGame(10)
         }
@@ -133,6 +142,8 @@ class MainActivity : AppCompatActivity() {
         currentBoardSize = size
         board = Array(size) { arrayOfNulls<String>(size) }
         currentPlayerIndex = 0
+        
+        // PINDAH KE LAYAR GAME (CHILD 4)
         viewFlipper.displayedChild = 4 
 
         gameGrid.removeAllViews()
@@ -152,7 +163,7 @@ class MainActivity : AppCompatActivity() {
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size >= 10) 12f else 18f
+                    textSize = if (size >= 10) 10f else 18f
                     setBackgroundColor(Color.BLACK)
                     setOnClickListener { handleMove(this, i, j) }
                 }
@@ -161,6 +172,9 @@ class MainActivity : AppCompatActivity() {
         }
         updateTurnUI()
     }
+
+    // --- LOGIKA PERMAINAN (checkWin, handleMove, robotMove tetap sama) ---
+    // ... (Gunakan logika checkWin diagonal yang saya berikan sebelumnya agar tidak bug)
 
     private fun handleMove(btn: Button, r: Int, c: Int) {
         if (btn.text.isNotEmpty()) return
@@ -225,7 +239,6 @@ class MainActivity : AppCompatActivity() {
             return count
         }
 
-        // Cek 4 Arah: Horizontal, Vertical, Diagonal Utama, Diagonal Anti
         if (checkDirection(0, 1) + checkDirection(0, -1) + 1 >= winCondition) return true
         if (checkDirection(1, 0) + checkDirection(-1, 0) + 1 >= winCondition) return true
         if (checkDirection(1, 1) + checkDirection(-1, -1) + 1 >= winCondition) return true
@@ -280,5 +293,9 @@ class MainActivity : AppCompatActivity() {
             playerScores[i] = sharedPref.getInt("SCORE_P${i+1}", 0)
         }
         updateLeaderboardUI()
+    }
+
+    private fun openUrl(url: String) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 }
