@@ -10,7 +10,6 @@ import android.os.Looper
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -92,15 +91,19 @@ class MainActivity : AppCompatActivity() {
             openUrl("https://mifahmi.vercel.app/")
         }
 
-        // Mode Game
+        // Mode Game - Pilih Robot langsung main 3x3
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
             vsRobot = true
             totalPlayers = 2
             initGame(3) 
         }
-        findViewById<Button>(R.id.btnModeFriends).setOnClickListener { showPlayerCountDialog() }
 
-        // Reset & Exit
+        // Mode Friends - Panggil Custom Overlay Player Count
+        findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
+            showPlayerCountOverlay() 
+        }
+
+        // Reset Skor & Exit Game
         findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
             for (i in 0..5) playerScores[i] = 0
             saveScores()
@@ -115,18 +118,32 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showPlayerCountDialog() {
-        val options = arrayOf("2 Players (3x3)", "4 Players (6x6)", "6 Players (10x10)")
-        AlertDialog.Builder(this)
-            .setTitle("Pilih Jumlah Pemain")
-            .setItems(options) { _, which ->
-                vsRobot = false
-                when (which) {
-                    0 -> { totalPlayers = 2; initGame(3) }
-                    1 -> { totalPlayers = 4; initGame(6) }
-                    2 -> { totalPlayers = 6; initGame(10) }
-                }
-            }.show()
+    // LOGIKA CUSTOM OVERLAY UNTUK PILIH JUMLAH PEMAIN
+    private fun showPlayerCountOverlay() {
+        val dialogOverlay = findViewById<RelativeLayout>(R.id.dialogPlayerCount)
+        dialogOverlay.visibility = View.VISIBLE
+        dialogOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+
+        findViewById<Button>(R.id.btnOpt2).setOnClickListener {
+            dialogOverlay.visibility = View.GONE
+            vsRobot = false
+            totalPlayers = 2
+            initGame(3)
+        }
+
+        findViewById<Button>(R.id.btnOpt4).setOnClickListener {
+            dialogOverlay.visibility = View.GONE
+            vsRobot = false
+            totalPlayers = 4
+            initGame(6)
+        }
+
+        findViewById<Button>(R.id.btnOpt6).setOnClickListener {
+            dialogOverlay.visibility = View.GONE
+            vsRobot = false
+            totalPlayers = 6
+            initGame(10)
+        }
     }
 
     private fun initGame(size: Int) {
@@ -207,7 +224,8 @@ class MainActivity : AppCompatActivity() {
         if (emptyCells.isNotEmpty()) {
             val move = emptyCells[Random().nextInt(emptyCells.size)]
             val index = move.first * currentBoardSize + move.second
-            handleMove(gameGrid.getChildAt(index) as Button, move.first, move.second)
+            val childBtn = gameGrid.getChildAt(index) as? Button
+            childBtn?.let { handleMove(it, move.first, move.second) }
         }
     }
 
@@ -215,7 +233,7 @@ class MainActivity : AppCompatActivity() {
         val symbol = board[r][c]
         val winCondition = if (currentBoardSize >= 6) 4 else 3 
         
-        // Cek Horizontal & Vertical dengan Win Condition Dinamis
+        // Cek Horizontal
         var countH = 0
         for (j in 0 until currentBoardSize) {
             if (board[r][j] == symbol) {
@@ -224,6 +242,7 @@ class MainActivity : AppCompatActivity() {
             } else countH = 0
         }
 
+        // Cek Vertical
         var countV = 0
         for (i in 0 until currentBoardSize) {
             if (board[i][c] == symbol) {
@@ -239,19 +258,17 @@ class MainActivity : AppCompatActivity() {
     private fun showGameOver(result: String) {
         val gameOverLayout = findViewById<RelativeLayout>(R.id.gameOverLayout)
         val tvWinnerResult = findViewById<TextView>(R.id.tvWinnerResult)
-        val btnPlayAgain = findViewById<Button>(R.id.btnPlayAgain)
-        val btnBackToMenu = findViewById<Button>(R.id.btnBackToMenu)
-
+        
         tvWinnerResult.text = result
         gameOverLayout.visibility = View.VISIBLE
         gameOverLayout.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
 
-        btnPlayAgain.setOnClickListener {
+        findViewById<Button>(R.id.btnPlayAgain).setOnClickListener {
             gameOverLayout.visibility = View.GONE
             initGame(currentBoardSize)
         }
 
-        btnBackToMenu.setOnClickListener {
+        findViewById<Button>(R.id.btnBackToMenu).setOnClickListener {
             gameOverLayout.visibility = View.GONE
             viewFlipper.displayedChild = 1
         }
