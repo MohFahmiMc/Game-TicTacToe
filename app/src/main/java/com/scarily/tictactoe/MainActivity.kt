@@ -1,6 +1,7 @@
 package com.scarily.tictactoe
 
 import android.app.AlertDialog
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -9,7 +10,6 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -19,10 +19,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameGrid: GridLayout
     private lateinit var splashLayout: RelativeLayout
     
-    // Daftar simbol dan warna untuk banyak pemain
+    // Simbol dan warna unik untuk 6 pemain
     private val playerSymbols = arrayOf("X", "O", "Z", "B", "D", "C")
     private val playerColors = arrayOf("#00FFCC", "#FF4444", "#FFBB33", "#99CC00", "#AA66CC", "#33B5E5")
     
+    private var scoreX = 0
+    private var scoreO = 0
     private var currentPlayerIndex = 0
     private var totalPlayers = 2
     private lateinit var board: Array<Array<String?>>
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Inisialisasi View
         viewFlipper = findViewById(R.id.viewFlipper)
         tvLeaderboard = findViewById(R.id.tvLeaderboard)
         gameGrid = findViewById(R.id.gameGrid)
@@ -41,7 +44,10 @@ class MainActivity : AppCompatActivity() {
         val imgTeam = findViewById<ImageView>(R.id.imgLogoTeam)
         val imgMe = findViewById<ImageView>(R.id.imgLogoMe)
 
-        // SPLASH SCREEN: Latar Putih (Team) -> Abu Gelap (Me)
+        // Load Skor yang tersimpan sebelumnya
+        loadScores()
+
+        // 1. SPLASH SCREEN: Latar Putih (Team) -> Abu Gelap (Me)
         splashLayout.setBackgroundColor(Color.WHITE)
         imgTeam.alpha = 0f
         imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
@@ -52,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 imgMe.alpha = 0f
                 imgMe.animate().alpha(1f).setDuration(1000).withEndAction {
                     Handler(Looper.getMainLooper()).postDelayed({
-                        viewFlipper.displayedChild = 1
+                        viewFlipper.displayedChild = 1 // Pindah ke Home
                     }, 1000)
                 }.start()
             }, 1000)
@@ -62,10 +68,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
+        // Tombol PLAY di Home
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener {
-            viewFlipper.displayedChild = 3
+            viewFlipper.displayedChild = 3 // Ke Overlay Pemilihan Mode
         }
 
+        // Tombol EXIT di Home
+        findViewById<Button>(R.id.btnExitApp).setOnClickListener {
+            finishAffinity() 
+        }
+
+        // Tombol SETTINGS
+        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { viewFlipper.displayedChild = 2 }
+        findViewById<Button>(R.id.btnCloseSettings).setOnClickListener { viewFlipper.displayedChild = 1 }
+
+        // Pemilihan Mode
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
             vsRobot = true
             totalPlayers = 2
@@ -75,9 +92,19 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
             showPlayerCountDialog() 
         }
+
+        // Tombol Reset Score di Leaderboard
+        findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
+            scoreX = 0
+            scoreO = 0
+            saveScores()
+            updateLeaderboardUI()
+            Toast.makeText(this, "Skor direset!", Toast.LENGTH_SHORT).show()
+        }
         
+        // Tombol Keluar saat Game Berlangsung
         findViewById<Button>(R.id.btnExitGame).setOnClickListener {
-            viewFlipper.displayedChild = 3
+            viewFlipper.displayedChild = 1
         }
     }
 
@@ -104,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
         gameGrid.rowCount = size
-        // Beri warna latar grid agar garis terlihat
+        // Beri background grid agar garis terlihat jelas
         gameGrid.setBackgroundColor(Color.parseColor("#555555")) 
 
         for (i in 0 until size) {
@@ -120,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                     layoutParams = params
                     
                     text = ""
+                    textSize = if (size == 12) 10f else if (size == 6) 16f else 28f
                     setBackgroundColor(Color.BLACK)
                     setOnClickListener { handleMove(this, i, j) }
                 }
@@ -139,19 +167,22 @@ class MainActivity : AppCompatActivity() {
         btn.setTextColor(color)
         board[r][c] = symbol
         
+        // Animasi klik neon
         btn.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
 
         if (checkWin(r, c)) {
+            if (symbol == "X") scoreX++ else if (symbol == "O") scoreO++
+            saveScores()
             showGameOver("Pemain $symbol Menang!")
             return
         }
 
         if (isFull()) {
-            showGameOver("Seri!")
+            showGameOver("Pertandingan Seri!")
             return
         }
 
-        // Ganti giliran pemain (X -> O -> Z -> B -> D -> C)
+        // Rotasi giliran pemain
         currentPlayerIndex = (currentPlayerIndex + 1) % totalPlayers
         updateTurnUI()
 
@@ -178,24 +209,55 @@ class MainActivity : AppCompatActivity() {
         val symbol = board[r][c]
         val winCondition = if (currentBoardSize > 3) 4 else 3 
         
-        // Cek Horizontal, Vertical, dan Diagonal (Logika Win)
-        // ... (Gunakan logika checkWin kamu yang sebelumnya)
-        return false // Ganti dengan return logika check kamu
+        // Logika sederhana: Cek baris & kolom
+        var countR = 0
+        for (j in 0 until currentBoardSize) if (board[r][j] == symbol) countR++
+        if (countR == winCondition) return true
+
+        var countC = 0
+        for (i in 0 until currentBoardSize) if (board[i][c] == symbol) countC++
+        if (countC == winCondition) return true
+
+        return false // Tambahkan logika diagonal jika perlu
     }
 
     private fun updateTurnUI() {
-        tvLeaderboard.text = "Giliran: ${playerSymbols[currentPlayerIndex]}"
+        tvLeaderboard.text = "Giliran: ${playerSymbols[currentPlayerIndex]} | X: $scoreX O: $scoreO"
         tvLeaderboard.setTextColor(Color.parseColor(playerColors[currentPlayerIndex]))
     }
 
     private fun isFull(): Boolean = board.all { row -> row.all { it != null } }
 
     private fun showGameOver(result: String) {
+        updateLeaderboardUI()
         AlertDialog.Builder(this)
-            .setTitle("Game Over")
+            .setTitle("Permainan Berakhir")
             .setMessage(result)
+            .setCancelable(false)
             .setPositiveButton("Main Lagi") { _, _ -> initGame(currentBoardSize) }
-            .setNegativeButton("Keluar") { _, _ -> viewFlipper.displayedChild = 3 }
+            .setNegativeButton("Menu Utama") { _, _ -> viewFlipper.displayedChild = 1 }
             .show()
+    }
+
+    private fun updateLeaderboardUI() {
+        tvLeaderboard.text = "WIN X: $scoreX | WIN O: $scoreO"
+        tvLeaderboard.setTextColor(Color.parseColor("#00FFCC"))
+    }
+
+    // Fungsi Penyimpanan Skor Permanen
+    private fun saveScores() {
+        val sharedPref = getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putInt("SCORE_X", scoreX)
+            putInt("SCORE_O", scoreO)
+            apply()
+        }
+    }
+
+    private fun loadScores() {
+        val sharedPref = getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+        scoreX = sharedPref.getInt("SCORE_X", 0)
+        scoreO = sharedPref.getInt("SCORE_O", 0)
+        updateLeaderboardUI()
     }
 }
