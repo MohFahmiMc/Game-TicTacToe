@@ -32,7 +32,10 @@ jobs:
         with:
           gradle-version: 8.1
 
-      # TAMBAHKAN INI BIAR GAK PERMISSION DENIED
+      # PERBAIKAN KUNCI: Membuat ulang wrapper yang hilang/rusak
+      - name: Regenerate Gradle Wrapper
+        run: gradle wrapper
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
