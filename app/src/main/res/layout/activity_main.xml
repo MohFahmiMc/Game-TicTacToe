@@ -16,17 +16,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:src="@drawable/logoteam"
-                android:layout_margin="10dp"
-                android:contentDescription="Team Logo"/>
+                android:layout_margin="10dp"/>
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:src="@drawable/logome"
-                android:layout_margin="10dp"
-                android:contentDescription="My Logo"/>
+                android:layout_margin="10dp"/>
         </LinearLayout>
         <ProgressBar
             android:layout_width="40dp"
@@ -48,8 +46,7 @@
             android:layout_alignParentEnd="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_settings"
-            app:tint="#00FFCC"
-            android:contentDescription="Settings"/>
+            app:tint="#00FFCC"/>
         
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,13 +59,12 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:src="@drawable/logoapp"
-                android:layout_marginBottom="20dp"
-                android:contentDescription="App Logo"/>
+                android:layout_marginBottom="20dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/game_title"
+                android:text="TIC TAC TOE"
                 android:textColor="#FFFFFF"
                 android:textSize="36sp"
                 android:textStyle="bold"
@@ -79,10 +75,11 @@
                 android:layout_width="240dp"
                 android:layout_height="65dp"
                 android:layout_marginTop="50dp"
-                android:text="@string/btn_play_now"
+                android:text="PLAY NOW"
                 android:backgroundTint="#00FFCC"
                 android:textColor="#000000"
                 android:textStyle="bold"
+                app:cornerRadius="32dp"
                 android:elevation="8dp"/>
         </LinearLayout>
     </RelativeLayout>
@@ -101,7 +98,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_title"
+                android:text="Settings"
                 android:textColor="#00FFCC"
                 android:textSize="26sp"
                 android:textStyle="bold"/>
@@ -112,8 +109,7 @@
                 android:layout_alignParentEnd="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_close"
-                app:tint="#FF4444"
-                android:contentDescription="Close"/>
+                app:tint="#FF4444"/>
         </RelativeLayout>
         
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333" android:layout_marginVertical="30dp"/>
@@ -121,36 +117,72 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/settings_developer"
+            android:text="Developer: Mohfahmi"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"/>
-            
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_github"
-            android:textColor="#00FFCC"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"/>
         
         <Button
             android:id="@+id/btnChangeTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:text="@string/settings_theme"
+            android:text="Change Theme"
             android:backgroundTint="#222222"
-            android:textColor="#FFFFFF"/>
+            app:cornerRadius="12dp"/>
+    </LinearLayout>
 
-        <Button
-            android:id="@+id/btnChangeLanguage"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="30dp"
+        android:gravity="center"
+        android:background="#0F0F0F">
+
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/settings_language"
-            android:backgroundTint="#222222"
-            android:textColor="#FFFFFF"/>
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="#1A1A1A"
+            app:cardElevation="10dp"
+            android:layout_marginBottom="60dp">
+            <TextView
+                android:id="@+id/tvLeaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="25dp"
+                android:text="WIN X: 0 | WIN O: 0"
+                android:textAlignment="center"
+                android:textColor="#00FFCC"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/btnModeRobot"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:text="VS ROBOT"
+            android:backgroundTint="#007BFF"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp"
+            app:cornerRadius="35dp"
+            android:elevation="6dp"/>
+
+        <Button
+            android:id="@+id/btnModeFriends"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:text="VS FRIENDS"
+            android:backgroundTint="#6F42C1"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cornerRadius="35dp"
+            android:elevation="6dp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -158,62 +190,37 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="20dp"
-        android:gravity="center">
-        
-        <TextView
-            android:id="@+id/tvLeaderboard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#1A1A1A"
-            android:padding="20dp"
-            android:text="@string/score_format"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:layout_marginBottom="50dp"
-            android:elevation="4dp"/>
-
-        <Button
-            android:id="@+id/btnModeRobot"
-            android:layout_width="260dp"
-            android:layout_height="65dp"
-            android:text="@string/mode_vs_robot"
-            android:backgroundTint="#007BFF"
-            android:layout_marginBottom="20dp"
-            android:textStyle="bold"/>
-        <Button
-            android:id="@+id/btnModeFriends"
-            android:layout_width="260dp"
-            android:layout_height="65dp"
-            android:text="@string/mode_vs_friends"
-            android:backgroundTint="#6F42C1"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:gravity="center_horizontal">
         
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="MATCH IN PROGRESS"
             android:textColor="#00FFCC"
-            android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
             android:textStyle="bold"
             android:letterSpacing="0.2"/>
             
         <GridLayout
             android:id="@+id/gameGrid"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="5dp"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:columnCount="3"
+            android:rowCount="3"
+            android:padding="8dp"
             android:background="#222222"
-            android:elevation="4dp"/>
+            android:elevation="10dp"/>
+
+        <Button
+            android:id="@+id/btnExitGame"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="EXIT GAME"
+            android:backgroundTint="#FF4444"
+            app:cornerRadius="24dp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
 </ViewFlipper>
