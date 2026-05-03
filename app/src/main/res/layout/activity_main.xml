@@ -4,30 +4,26 @@
     android:id="@+id/viewFlipper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#050505">
 
     <RelativeLayout
         android:id="@+id/splashLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF">
-
         <androidx.cardview.widget.CardView
             android:layout_width="250dp"
             android:layout_height="250dp"
             android:layout_centerInParent="true"
-            app:cardCornerRadius="50dp"
-            app:cardElevation="0dp"
+            app:cardCornerRadius="60dp"
+            app:cardElevation="20dp"
             app:cardBackgroundColor="@android:color/transparent">
-
             <ImageView
                 android:id="@+id/imgLogoTeam"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/logoteam"
-                android:scaleType="centerCrop"
-                android:visibility="visible" />
-
+                android:scaleType="centerCrop" />
             <ImageView
                 android:id="@+id/imgLogoMe"
                 android:layout_width="match_parent"
@@ -42,14 +38,13 @@
         android:id="@+id/homeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp">
-        
-        <ImageButton
+        android:background="@drawable/bg_main_neon"> <ImageButton
             android:id="@+id/btnSettings"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentEnd="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_margin="20dp"
+            android:background="@drawable/circle_neon_btn"
             android:src="@drawable/ic_settings"
             app:tint="#00FFCC"/>
         
@@ -61,170 +56,176 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:src="@drawable/logoapp"
-                android:layout_marginBottom="20dp"/>
+                android:elevation="15dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TIC TAC TOE"
-                android:textColor="#FFFFFF"
-                android:textSize="36sp"
+                android:text="NEON TIC TAC TOE"
+                android:textColor="#00FFCC"
+                android:textSize="32sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.1"/>
+                android:shadowColor="#00FFCC"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="15"/>
 
             <Button
                 android:id="@+id/btnGameTicTacToe"
-                android:layout_width="240dp"
-                android:layout_height="65dp"
-                android:layout_marginTop="50dp"
+                android:layout_width="260dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="60dp"
                 android:text="PLAY NOW"
                 android:backgroundTint="#00FFCC"
                 android:textColor="#000000"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                app:cornerRadius="32dp"
-                android:elevation="8dp"/>
+                app:cornerRadius="35dp"
+                android:elevation="12dp"/>
+
+            <Button
+                android:id="@+id/btnExitApp"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:text="EXIT GAME"
+                android:backgroundTint="#222222"
+                android:textColor="#FF4444"
+                app:cornerRadius="30dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
         </LinearLayout>
     </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/settingsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="25dp"
-        android:background="#111111">
-        
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Settings"
-                android:textColor="#00FFCC"
-                android:textSize="26sp"
-                android:textStyle="bold"/>
-            <ImageButton
-                android:id="@+id/btnCloseSettings"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_close"
-                app:tint="#FF4444"/>
-        </RelativeLayout>
-        
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333" android:layout_marginVertical="30dp"/>
-        
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Developer: Mohfahmi"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-        
-        <Button
-            android:id="@+id/btnChangeTheme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="Change Theme"
-            android:backgroundTint="#222222"
-            app:cornerRadius="12dp"/>
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="30dp"
-        android:gravity="center"
-        android:background="#0F0F0F">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#1A1A1A"
-            app:cardElevation="10dp"
-            android:layout_marginBottom="60dp">
-            <TextView
-                android:id="@+id/tvLeaderboard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:text="WIN X: 0 | WIN O: 0"
-                android:textAlignment="center"
-                android:textColor="#00FFCC"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
-        </androidx.cardview.widget.CardView>
-
-        <Button
-            android:id="@+id/btnModeRobot"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:text="VS ROBOT"
-            android:backgroundTint="#007BFF"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="20dp"
-            app:cornerRadius="35dp"
-            android:elevation="6dp"/>
-
-        <Button
-            android:id="@+id/btnModeFriends"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:text="VS FRIENDS"
-            android:backgroundTint="#6F42C1"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:cornerRadius="35dp"
-            android:elevation="6dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:gravity="center_horizontal">
-        
+        android:background="#0A0A0A">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MATCH IN PROGRESS"
+            android:text="Settings"
             android:textColor="#00FFCC"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"
-            android:textStyle="bold"
-            android:letterSpacing="0.2"/>
-            
+            android:textSize="28sp"
+            android:textStyle="bold"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333" android:layout_marginVertical="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dev: Mohfahmi"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"/>
+        <Button
+            android:id="@+id/btnCloseSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="BACK"
+            android:backgroundTint="#00FFCC"
+            android:textColor="#000000"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6000000"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="@drawable/neon_card_bg"> <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SELECT MODE"
+                android:textAlignment="center"
+                android:textColor="#00FFCC"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="30dp"/>
+
+            <Button
+                android:id="@+id/btnModeRobot"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:text="VS ROBOT (AI)"
+                android:backgroundTint="#007BFF"
+                app:cornerRadius="15dp"
+                android:layout_marginBottom="15dp"/>
+
+            <Button
+                android:id="@+id/btnModeFriends"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:text="VS FRIENDS (LOCAL)"
+                android:backgroundTint="#6F42C1"
+                app:cornerRadius="15dp"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#050505">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardLeaderboard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="#111111"
+            app:cardElevation="15dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp">
+                <TextView
+                    android:id="@+id/tvLeaderboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="X: 0 | O: 0"
+                    android:textColor="#00FFCC"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_centerVertical="true"/>
+                <ImageButton
+                    android:id="@+id/btnResetScore"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_refresh"
+                    android:background="@android:color/transparent"
+                    app:tint="#FF4444"/>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
         <GridLayout
             android:id="@+id/gameGrid"
             android:layout_width="320dp"
             android:layout_height="320dp"
+            android:layout_centerInParent="true"
             android:columnCount="3"
             android:rowCount="3"
-            android:padding="2dp"
-            android:background="#555555" 
-            android:elevation="10dp"/>
+            android:padding="4dp"
+            android:background="@drawable/grid_neon_border"
+            android:elevation="20dp"/>
 
         <Button
             android:id="@+id/btnExitGame"
-            android:layout_width="180dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:text="EXIT GAME"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="40dp"
+            android:text="QUIT"
             android:backgroundTint="#FF4444"
-            app:cornerRadius="24dp"
-            android:textStyle="bold"/>
-    </LinearLayout>
+            app:cornerRadius="20dp"/>
+    </RelativeLayout>
 </ViewFlipper>
