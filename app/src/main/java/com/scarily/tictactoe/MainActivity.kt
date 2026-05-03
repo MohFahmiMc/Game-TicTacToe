@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -33,11 +34,24 @@ class MainActivity : AppCompatActivity() {
         viewFlipper = findViewById(R.id.viewFlipper)
         tvLeaderboard = findViewById(R.id.tvLeaderboard)
         gameGrid = findViewById(R.id.gameGrid)
+        
+        val imgTeam = findViewById<ImageView>(R.id.imgLogoTeam)
+        val imgMe = findViewById<ImageView>(R.id.imgLogoMe)
 
-        // 1. SPLASH SCREEN (3 Detik)
-        Handler(Looper.getMainLooper()).postDelayed({
-            viewFlipper.displayedChild = 1 // Pindah ke Home Menu
-        }, 3000)
+        // 1. SPLASH SCREEN ANIMASI (Logo Team -> Logo Me -> Home)
+        imgTeam.alpha = 0f
+        imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
+            Handler(Looper.getMainLooper()).postDelayed({
+                imgTeam.visibility = View.GONE
+                imgMe.visibility = View.VISIBLE
+                imgMe.alpha = 0f
+                imgMe.animate().alpha(1f).setDuration(1000).withEndAction {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        viewFlipper.displayedChild = 1 // Pindah ke Home Menu
+                    }, 1000)
+                }.start()
+            }, 1000)
+        }.start()
 
         setupNavigation()
     }
@@ -48,12 +62,12 @@ class MainActivity : AppCompatActivity() {
             viewFlipper.displayedChild = 2
         }
 
-        // Tutup Settings (Tombol X)
+        // Tutup Settings
         findViewById<ImageButton>(R.id.btnCloseSettings).setOnClickListener {
             viewFlipper.displayedChild = 1
         }
 
-        // Fitur Settings: Ganti Tema (Dark/Light)
+        // Ganti Tema
         findViewById<Button>(R.id.btnChangeTheme)?.setOnClickListener {
             val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
             if (isDark) {
@@ -63,26 +77,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Fitur Settings: Ganti Bahasa (English default)
-        findViewById<Button>(R.id.btnChangeLanguage)?.setOnClickListener {
-            Toast.makeText(this, "Language set to English", Toast.LENGTH_SHORT).show()
-        }
-
-        // Pilih Game Tic Tac Toe
+        // Play Button di Home
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener {
-            viewFlipper.displayedChild = 3 // Menu Leaderboard & Mode
+            viewFlipper.displayedChild = 3 // Ke Halaman Pilih Mode
             updateLeaderboardUI()
         }
 
-        // Mode Tanding
+        // Pilih Mode
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { showDifficultyDialog() }
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { showPlayerCountDialog() }
+        
+        // Tombol Exit di dalam Game
+        findViewById<Button>(R.id.btnExitGame).setOnClickListener {
+            viewFlipper.displayedChild = 3
+        }
     }
 
     private fun showDifficultyDialog() {
-        val levels = arrayOf(getString(R.string.diff_easy), getString(R.string.diff_normal), getString(R.string.diff_hard))
+        val levels = arrayOf("Easy", "Normal", "Hard")
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_difficulty_title))
+            .setTitle("Select Difficulty")
             .setItems(levels) { _, which ->
                 difficulty = levels[which]
                 vsRobot = true
@@ -91,9 +105,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPlayerCountDialog() {
-        val options = arrayOf(getString(R.string.mode_2p), getString(R.string.mode_4p), getString(R.string.mode_6p))
+        val options = arrayOf("2 Players (3x3)", "4 Players (6x6)", "6 Players (12x12)")
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_player_title))
+            .setTitle("Select Mode")
             .setItems(options) { _, which ->
                 vsRobot = false
                 when (which) {
@@ -123,13 +137,15 @@ class MainActivity : AppCompatActivity() {
                     )
                     params.width = 0
                     params.height = 0
-                    params.setMargins(2, 2, 2, 2)
+                    params.setMargins(4, 4, 4, 4)
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size == 12) 8f else if (size == 6) 14f else 24f
-                    setBackgroundColor(Color.parseColor("#121212"))
+                    textSize = if (size == 12) 10f else if (size == 6) 16f else 28f
+                    setBackgroundColor(Color.parseColor("#222222"))
                     setTextColor(Color.parseColor("#00FFCC"))
+                    // Membuat tombol game agak melengkung
+                    stateListAnimator = null 
                     setOnClickListener { handleMove(this, i, j) }
                 }
                 gameGrid.addView(btn)
@@ -143,19 +159,20 @@ class MainActivity : AppCompatActivity() {
         btn.text = currentPlayer
         board[r][c] = currentPlayer
         
+        // Animasi saat tombol ditekan
         btn.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
-        btn.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction {
+        btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(100).withEndAction {
             btn.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100)
         }
 
         if (checkWin(r, c)) {
             if (currentPlayer == "X") scoreX++ else scoreO++
-            showGameOver(if (currentPlayer == "X") getString(R.string.win_x) else getString(R.string.win_o))
+            showGameOver("Winner: $currentPlayer")
             return
         }
 
         if (isFull()) {
-            showGameOver(getString(R.string.draw))
+            showGameOver("Draw!")
             return
         }
 
@@ -175,42 +192,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (emptyCells.isNotEmpty()) {
-            val move = when(difficulty) {
-                getString(R.string.diff_hard) -> findBestMove(emptyCells) // AI Lebih pinter
-                else -> emptyCells[Random().nextInt(emptyCells.size)]
-            }
+            val move = emptyCells[Random().nextInt(emptyCells.size)]
             val index = move.first * currentBoardSize + move.second
             handleMove(gameGrid.getChildAt(index) as Button, move.first, move.second)
         }
     }
 
-    private fun findBestMove(cells: List<Pair<Int, Int>>): Pair<Int, Int> {
-        // Logika sederhana Hard: Coba menang dulu, kalau tidak bisa, random
-        return cells[Random().nextInt(cells.size)]
-    }
-
     private fun checkWin(r: Int, c: Int): Boolean {
         val symbol = board[r][c]
-        val winCondition = 3 // Untuk 3x3, 6x6, 12x12 minimal 3 urutan
-
-        // Row check
+        val winCondition = 3 
+        
         var count = 0
         for (j in 0 until currentBoardSize) {
             if (board[r][j] == symbol) count++ else count = 0
             if (count == winCondition) return true
         }
-        // Column check
         count = 0
         for (i in 0 until currentBoardSize) {
             if (board[i][c] == symbol) count++ else count = 0
             if (count == winCondition) return true
         }
-        // Diagonals
         return checkDiagonals(symbol, winCondition)
     }
 
     private fun checkDiagonals(s: String?, win: Int): Boolean {
-        // Diagonal 1 (\)
         for (i in 0..currentBoardSize - win) {
             for (j in 0..currentBoardSize - win) {
                 var count = 0
@@ -218,7 +223,6 @@ class MainActivity : AppCompatActivity() {
                 if (count == win) return true
             }
         }
-        // Diagonal 2 (/)
         for (i in 0..currentBoardSize - win) {
             for (j in win - 1 until currentBoardSize) {
                 var count = 0
@@ -232,18 +236,17 @@ class MainActivity : AppCompatActivity() {
     private fun isFull(): Boolean = board.all { row -> row.all { it != null } }
 
     private fun showGameOver(result: String) {
-        val finalMsg = if (vsRobot && currentPlayer == "O") getString(R.string.you_lose) else result
-        
+        updateLeaderboardUI()
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.game_over_title))
-            .setMessage(finalMsg)
+            .setTitle("Game Over")
+            .setMessage(result)
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.btn_replay)) { _, _ -> initGame(currentBoardSize) }
-            .setNegativeButton(getString(R.string.btn_exit)) { _, _ -> viewFlipper.displayedChild = 3 }
+            .setPositiveButton("Replay") { _, _ -> initGame(currentBoardSize) }
+            .setNegativeButton("Exit") { _, _ -> viewFlipper.displayedChild = 3 }
             .show()
     }
 
     private fun updateLeaderboardUI() {
-        tvLeaderboard.text = getString(R.string.score_format, scoreX, scoreO)
+        tvLeaderboard.text = "WIN X: $scoreX | WIN O: $scoreO"
     }
 }
