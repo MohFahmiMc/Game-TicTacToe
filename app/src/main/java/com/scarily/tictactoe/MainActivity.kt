@@ -20,11 +20,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameGrid: GridLayout
     private lateinit var splashLayout: RelativeLayout
     
-    // Simbol dan warna unik untuk 6 pemain
     private val playerSymbols = arrayOf("1", "2", "3", "4", "5", "6")
     private val playerColors = arrayOf("#00FFCC", "#FF4444", "#FFBB33", "#99CC00", "#AA66CC", "#33B5E5")
     
-    // Data Pemain & Skor
     private var playerScores = IntArray(6) { 0 }
     private lateinit var scoreTextViews: Array<TextView>
     
@@ -38,13 +36,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi View Utama
         viewFlipper = findViewById(R.id.viewFlipper)
         tvTurnStatus = findViewById(R.id.tvTurnStatus)
         gameGrid = findViewById(R.id.gameGrid)
         splashLayout = findViewById(R.id.splashLayout)
         
-        // Hubungkan 6 TextView Skor
         scoreTextViews = arrayOf(
             findViewById(R.id.score_p1), findViewById(R.id.score_p2),
             findViewById(R.id.score_p3), findViewById(R.id.score_p4),
@@ -56,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
         loadScores()
 
-        // Logika Splash Screen
         splashLayout.setBackgroundColor(Color.WHITE)
         imgTeam.alpha = 0f
         imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
@@ -77,33 +72,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        // Navigasi Menu
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { viewFlipper.displayedChild = 3 }
         findViewById<Button>(R.id.btnExitApp).setOnClickListener { finishAffinity() }
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { viewFlipper.displayedChild = 2 }
         findViewById<Button>(R.id.btnCloseSettings).setOnClickListener { viewFlipper.displayedChild = 1 }
 
-        // Link Developer (GitHub & Portfolio)
-        findViewById<ImageButton>(R.id.btnGithub).setOnClickListener {
-            openUrl("https://github.com/MohFahmiMc")
-        }
-        findViewById<ImageButton>(R.id.btnWeb).setOnClickListener {
-            openUrl("https://mifahmi.vercel.app/")
-        }
+        findViewById<ImageButton>(R.id.btnGithub).setOnClickListener { openUrl("https://github.com/MohFahmiMc") }
+        findViewById<ImageButton>(R.id.btnWeb).setOnClickListener { openUrl("https://mifahmi.vercel.app/") }
 
-        // Mode Game - Pilih Robot langsung main 3x3
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
             vsRobot = true
             totalPlayers = 2
             initGame(3) 
         }
 
-        // Mode Friends - Panggil Custom Overlay Player Count
-        findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
-            showPlayerCountOverlay() 
-        }
+        findViewById<Button>(R.id.btnModeFriends).setOnClickListener { showPlayerCountOverlay() }
 
-        // Reset Skor & Exit Game
         findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
             for (i in 0..5) playerScores[i] = 0
             saveScores()
@@ -118,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    // LOGIKA CUSTOM OVERLAY UNTUK PILIH JUMLAH PEMAIN
     private fun showPlayerCountOverlay() {
         val dialogOverlay = findViewById<RelativeLayout>(R.id.dialogPlayerCount)
         dialogOverlay.visibility = View.VISIBLE
@@ -169,10 +152,7 @@ class MainActivity : AppCompatActivity() {
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size >= 10) 10f else 18f
-                    setPadding(0, 0, 0, 0)
-                    includeFontPadding = false
-                    
+                    textSize = if (size >= 10) 12f else 18f
                     setBackgroundColor(Color.BLACK)
                     setOnClickListener { handleMove(this, i, j) }
                 }
@@ -230,31 +210,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkWin(r: Int, c: Int): Boolean {
-        val symbol = board[r][c]
+        val symbol = board[r][c] ?: return false
         val winCondition = if (currentBoardSize >= 6) 4 else 3 
-        
-        // Cek Horizontal
-        var countH = 0
-        for (j in 0 until currentBoardSize) {
-            if (board[r][j] == symbol) {
-                countH++
-                if (countH == winCondition) return true
-            } else countH = 0
+
+        fun checkDirection(dr: Int, dc: Int): Int {
+            var count = 0
+            var currR = r + dr
+            var currC = c + dc
+            while (currR in 0 until currentBoardSize && currC in 0 until currentBoardSize && board[currR][currC] == symbol) {
+                count++
+                currR += dr
+                currC += dc
+            }
+            return count
         }
 
-        // Cek Vertical
-        var countV = 0
-        for (i in 0 until currentBoardSize) {
-            if (board[i][c] == symbol) {
-                countV++
-                if (countV == winCondition) return true
-            } else countV = 0
-        }
+        // Cek 4 Arah: Horizontal, Vertical, Diagonal Utama, Diagonal Anti
+        if (checkDirection(0, 1) + checkDirection(0, -1) + 1 >= winCondition) return true
+        if (checkDirection(1, 0) + checkDirection(-1, 0) + 1 >= winCondition) return true
+        if (checkDirection(1, 1) + checkDirection(-1, -1) + 1 >= winCondition) return true
+        if (checkDirection(1, -1) + checkDirection(-1, 1) + 1 >= winCondition) return true
 
         return false
     }
 
-    // LOGIKA CUSTOM WIN OVERLAY (MENGGANTIKAN ALERTDIALOG)
     private fun showGameOver(result: String) {
         val gameOverLayout = findViewById<RelativeLayout>(R.id.gameOverLayout)
         val tvWinnerResult = findViewById<TextView>(R.id.tvWinnerResult)
