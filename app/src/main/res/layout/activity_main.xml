@@ -199,49 +199,43 @@
         android:layout_height="match_parent"
         android:background="#050505">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#E6000000"
+        <LinearLayout
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/neon_card_bg"
+            android:orientation="vertical"
+            android:padding="25dp"
             android:gravity="center">
 
-            <LinearLayout
-                android:layout_width="320dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/neon_card_bg"
-                android:orientation="vertical"
-                android:padding="25dp"
-                android:gravity="center">
+                android:text="PILIH MODE"
+                android:textColor="#00FFCC"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="30dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="PILIH MODE"
-                    android:textColor="#00FFCC"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="30dp"/>
+            <Button
+                android:id="@+id/btnModeRobot"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:text="VS ROBOT (AI)"
+                android:backgroundTint="#007BFF"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="15dp"
+                android:layout_marginBottom="15dp"/>
 
-                <Button
-                    android:id="@+id/btnModeRobot"
-                    android:layout_width="match_parent"
-                    android:layout_height="65dp"
-                    android:text="VS ROBOT (AI)"
-                    android:backgroundTint="#007BFF"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="15dp"
-                    android:layout_marginBottom="15dp"/>
-
-                <Button
-                    android:id="@+id/btnModeFriends"
-                    android:layout_width="match_parent"
-                    android:layout_height="65dp"
-                    android:text="VS FRIENDS (LOCAL)"
-                    android:backgroundTint="#6F42C1"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="15dp"/>
-            </LinearLayout>
-        </RelativeLayout>
+            <Button
+                android:id="@+id/btnModeFriends"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:text="VS FRIENDS (LOCAL)"
+                android:backgroundTint="#6F42C1"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="15dp"/>
+        </LinearLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -262,6 +256,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp">
+                
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -293,6 +288,17 @@
                     <TextView android:id="@+id/score_p2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P2: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                     <TextView android:id="@+id/score_p3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P3: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:weightSum="3">
+                    <TextView android:id="@+id/score_p4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P4: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                    <TextView android:id="@+id/score_p5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P5: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                    <TextView android:id="@+id/score_p6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P6: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -301,8 +307,8 @@
             android:layout_width="340dp"
             android:layout_height="340dp"
             android:layout_centerInParent="true"
-            android:columnCount="10"
-            android:rowCount="10"
+            android:columnCount="3"
+            android:rowCount="3"
             android:padding="2dp"
             android:background="@drawable/grid_neon_border"
             android:elevation="10dp"/>
