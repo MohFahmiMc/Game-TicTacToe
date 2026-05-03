@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      # Memaksa penggunaan Node.js 24 agar tidak deprecated
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
@@ -33,15 +32,16 @@ jobs:
         with:
           gradle-version: 8.1
 
+      # TAMBAHKAN INI BIAR GAK PERMISSION DENIED
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      # PERBAIKAN: Rename dan pindah file ke root agar path simpel
       - name: Prepare APK Artifact
         run: |
-          mkdir -p apk_output
           cp app/build/outputs/apk/debug/app-debug.apk ./TicTacToe.apk
-        # Baris di atas menyalin APK hasil build dan mengubah namanya jadi TicTacToe.apk di folder utama
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
