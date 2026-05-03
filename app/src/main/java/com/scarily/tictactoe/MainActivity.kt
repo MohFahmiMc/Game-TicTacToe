@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var board: Array<Array<String?>>
     private var currentBoardSize = 3
     private var vsRobot = false
+    private var difficulty = "easy" // Default difficulty
 
     private var bgmPlayer: MediaPlayer? = null
     private var isTenseMode = false
@@ -42,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi View dengan null-safety check (biar gak crash kalau ID salah)
         try {
             viewFlipper = findViewById(R.id.viewFlipper)
             tvTurnStatus = findViewById(R.id.tvTurnStatus)
@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
             loadScores()
             startSplashScreen()
             setupNavigation()
-            setupFlickerEffect() 
             startDustAnimation()
         } catch (e: Exception) {
             Toast.makeText(this, "Error Inisialisasi: ${e.message}", Toast.LENGTH_LONG).show()
@@ -92,15 +91,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val animDust = AnimationUtils.loadAnimation(this, R.anim.dust_move)
             dustEffect.startAnimation(animDust)
-        } catch (e: Exception) { /* Animasi tidak ketemu */ }
-    }
-
-    private fun setupFlickerEffect() {
-        try {
-            val flicker = AnimationUtils.loadAnimation(this, R.anim.neon_flicker)
-            // Pakai ID layout utama (homeLayout) sesuai XML kamu
-            findViewById<View>(R.id.homeLayout)?.startAnimation(flicker)
-        } catch (e: Exception) { /* Animasi tidak ketemu */ }
+        } catch (e: Exception) {}
     }
 
     private fun setupNavigation() {
@@ -112,10 +103,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnGithub).setOnClickListener { openUrl("https://github.com/MohFahmiMc") }
         findViewById<ImageButton>(R.id.btnWeb).setOnClickListener { openUrl("https://mifahmi.vercel.app/") }
 
+        // UPDATE: Sekarang tombol Robot memicu Dialog Difficulty
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
-            vsRobot = true
-            totalPlayers = 2
-            initGame(3) 
+            showDifficultyOverlay()
         }
 
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
@@ -136,14 +126,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // UPDATE: Fungsi untuk handle pilihan Difficulty
+    private fun showDifficultyOverlay() {
+        val difficultyOverlay = findViewById<RelativeLayout>(R.id.dialogDifficulty)
+        difficultyOverlay.visibility = View.VISIBLE
+        
+        findViewById<Button>(R.id.btnEasy).setOnClickListener {
+            difficulty = "easy"
+            vsRobot = true
+            totalPlayers = 2
+            difficultyOverlay.visibility = View.GONE
+            initGame(3)
+        }
+
+        findViewById<Button>(R.id.btnNormal).setOnClickListener {
+            difficulty = "normal"
+            vsRobot = true
+            totalPlayers = 2
+            difficultyOverlay.visibility = View.GONE
+            initGame(3)
+        }
+
+        findViewById<Button>(R.id.btnHard).setOnClickListener {
+            difficulty = "hard"
+            vsRobot = true
+            totalPlayers = 2
+            difficultyOverlay.visibility = View.GONE
+            initGame(3)
+        }
+    }
+
     private fun showPlayerCountOverlay() {
         val dialogOverlay = findViewById<RelativeLayout>(R.id.dialogPlayerCount)
         dialogOverlay.visibility = View.VISIBLE
         
-        try {
-            dialogOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
-        } catch (e: Exception) {}
-
         findViewById<Button>(R.id.btnOpt2).setOnClickListener {
             dialogOverlay.visibility = View.GONE
             totalPlayers = 2
@@ -188,7 +204,7 @@ class MainActivity : AppCompatActivity() {
                     )
                     params.width = 0
                     params.height = 0
-                    params.setMargins(4, 4, 4, 4) // Margin ditambah biar kotak gak dempet
+                    params.setMargins(4, 4, 4, 4)
                     layoutParams = params
                     
                     text = ""
@@ -217,20 +233,7 @@ class MainActivity : AppCompatActivity() {
             btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.button_pop))
         } catch (e: Exception) {}
 
-        // Menggunakan simbol lowercase (x, o, a...) sesuai koreksi nama file resource
         playSFX(symbol.lowercase())
-
-        val filledCells = board.flatten().count { it != null }
-        val triggerPoint = (currentBoardSize * currentBoardSize) / 2
-        
-        if (!isTenseMode && filledCells >= triggerPoint) {
-            isTenseMode = true
-            startBGM(R.raw.tense)
-            hellOverlay.visibility = View.VISIBLE
-            try {
-                hellOverlay.startAnimation(AnimationUtils.loadAnimation(this, R.anim.neon_flicker))
-            } catch (e: Exception) {}
-        }
 
         if (checkWin(r, c)) {
             playerScores[currentPlayerIndex]++
@@ -248,43 +251,13 @@ class MainActivity : AppCompatActivity() {
         currentPlayerIndex = (currentPlayerIndex + 1) % totalPlayers
         updateTurnUI()
 
+        // Robot jalan jika mode VS Robot dan gilirannya
         if (vsRobot && currentPlayerIndex == 1) {
             gameGrid.postDelayed({ robotMove() }, 600)
         }
     }
 
-    private fun startBGM(resId: Int) {
-        try {
-            bgmPlayer?.stop()
-            bgmPlayer?.release()
-            bgmPlayer = MediaPlayer.create(this, resId)
-            bgmPlayer?.isLooping = true
-            bgmPlayer?.start()
-        } catch (e: Exception) { 
-            // Jangan crash kalau file audio hilang
-        }
-    }
-
-    private fun stopBGM() {
-        bgmPlayer?.let {
-            it.stop()
-            it.release()
-        }
-        bgmPlayer = null
-    }
-
-    private fun playSFX(name: String) {
-        val resId = resources.getIdentifier(name, "raw", packageName)
-        if (resId != 0) {
-            try {
-                MediaPlayer.create(this, resId).apply {
-                    setOnCompletionListener { release() }
-                    start()
-                }
-            } catch (e: Exception) {}
-        }
-    }
-
+    // UPDATE: Logika Robot berdasarkan Difficulty
     private fun robotMove() {
         val emptyCells = mutableListOf<Pair<Int, Int>>()
         for (i in 0 until currentBoardSize) {
@@ -292,12 +265,42 @@ class MainActivity : AppCompatActivity() {
                 if (board[i][j] == null) emptyCells.add(Pair(i, j))
             }
         }
-        if (emptyCells.isNotEmpty()) {
-            val move = emptyCells.random()
-            val index = move.first * currentBoardSize + move.second
-            val childBtn = gameGrid.getChildAt(index) as? Button
-            childBtn?.let { handleMove(it, move.first, move.second) }
+        
+        if (emptyCells.isEmpty()) return
+
+        var move: Pair<Int, Int> = emptyCells.random()
+
+        if (difficulty == "hard" || difficulty == "normal") {
+            // Logika blokir player (Cek apakah player mau menang)
+            val playerSymbol = playerSymbols[0]
+            for (cell in emptyCells) {
+                board[cell.first][cell.second] = playerSymbol
+                if (checkWin(cell.first, cell.second)) {
+                    move = cell
+                    board[cell.first][cell.second] = null
+                    break
+                }
+                board[cell.first][cell.second] = null
+            }
+            
+            // Logika cari kemenangan sendiri (Hanya di Hard)
+            if (difficulty == "hard") {
+                val botSymbol = playerSymbols[1]
+                for (cell in emptyCells) {
+                    board[cell.first][cell.second] = botSymbol
+                    if (checkWin(cell.first, cell.second)) {
+                        move = cell
+                        board[cell.first][cell.second] = null
+                        break
+                    }
+                    board[cell.first][cell.second] = null
+                }
+            }
         }
+
+        val index = move.first * currentBoardSize + move.second
+        val childBtn = gameGrid.getChildAt(index) as? Button
+        childBtn?.let { handleMove(it, move.first, move.second) }
     }
 
     private fun checkWin(r: Int, c: Int): Boolean {
@@ -377,6 +380,36 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: Exception) {
             Toast.makeText(this, "Browser tidak ditemukan", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun startBGM(resId: Int) {
+        try {
+            bgmPlayer?.stop()
+            bgmPlayer?.release()
+            bgmPlayer = MediaPlayer.create(this, resId)
+            bgmPlayer?.isLooping = true
+            bgmPlayer?.start()
+        } catch (e: Exception) {}
+    }
+
+    private fun stopBGM() {
+        bgmPlayer?.let {
+            it.stop()
+            it.release()
+        }
+        bgmPlayer = null
+    }
+
+    private fun playSFX(name: String) {
+        val resId = resources.getIdentifier(name, "raw", packageName)
+        if (resId != 0) {
+            try {
+                MediaPlayer.create(this, resId).apply {
+                    setOnCompletionListener { release() }
+                    start()
+                }
+            } catch (e: Exception) {}
         }
     }
 
