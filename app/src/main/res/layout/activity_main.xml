@@ -197,39 +197,51 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E6000000"
-        android:gravity="center">
-        <LinearLayout
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:background="@drawable/neon_card_bg"> 
-            <TextView
-                android:layout_width="match_parent"
+        android:background="#050505">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E6000000"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="320dp"
                 android:layout_height="wrap_content"
-                android:text="SELECT MODE"
-                android:textAlignment="center"
-                android:textColor="#00FFCC"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="30dp"/>
-            <Button
-                android:id="@+id/btnModeRobot"
-                android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:text="VS ROBOT (AI)"
-                android:backgroundTint="#007BFF"
-                app:cornerRadius="15dp"
-                android:layout_marginBottom="15dp"/>
-            <Button
-                android:id="@+id/btnModeFriends"
-                android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:text="VS FRIENDS (LOCAL)"
-                android:backgroundTint="#6F42C1"
-                app:cornerRadius="15dp"/>
-        </LinearLayout>
+                android:background="@drawable/neon_card_bg"
+                android:orientation="vertical"
+                android:padding="25dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PILIH MODE"
+                    android:textColor="#00FFCC"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="30dp"/>
+
+                <Button
+                    android:id="@+id/btnModeRobot"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:text="VS ROBOT (AI)"
+                    android:backgroundTint="#007BFF"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="15dp"
+                    android:layout_marginBottom="15dp"/>
+
+                <Button
+                    android:id="@+id/btnModeFriends"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:text="VS FRIENDS (LOCAL)"
+                    android:backgroundTint="#6F42C1"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="15dp"/>
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -271,6 +283,7 @@
                         android:background="@android:color/transparent"
                         app:tint="#FF4444"/>
                 </RelativeLayout>
+                
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -279,16 +292,6 @@
                     <TextView android:id="@+id/score_p1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P1: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                     <TextView android:id="@+id/score_p2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P2: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                     <TextView android:id="@+id/score_p3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P3: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="5dp"
-                    android:weightSum="3">
-                    <TextView android:id="@+id/score_p4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P4: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
-                    <TextView android:id="@+id/score_p5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P5: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
-                    <TextView android:id="@+id/score_p6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P6: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -323,42 +326,47 @@
             android:background="#E6000000"
             android:gravity="center"
             android:visibility="gone"
-            android:elevation="50dp">
+            android:elevation="100dp">
+
             <LinearLayout
-                android:layout_width="300dp"
+                android:layout_width="320dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/neon_card_bg"
                 android:orientation="vertical"
-                android:padding="25dp"
+                android:padding="30dp"
                 android:gravity="center">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="GAME OVER"
+                    android:text="PERMAINAN BERAKHIR"
                     android:textColor="#FF4444"
-                    android:textSize="28sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:shadowColor="#FF4444"
                     android:shadowRadius="10"/>
+
                 <TextView
                     android:id="@+id/tvWinnerResult"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pemain 1 Menang!"
+                    android:text="Pemain X Menang!"
                     android:textColor="#00FFCC"
-                    android:textSize="20sp"
-                    android:layout_marginTop="10dp"
+                    android:textSize="18sp"
+                    android:layout_marginTop="15dp"
                     android:textAlignment="center"/>
+
                 <Button
                     android:id="@+id/btnPlayAgain"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="35dp"
                     android:text="MAIN LAGI"
                     android:backgroundTint="#00FFCC"
                     android:textColor="#000000"
                     android:textStyle="bold"
                     app:cornerRadius="15dp"/>
+
                 <Button
                     android:id="@+id/btnBackToMenu"
                     android:layout_width="match_parent"
@@ -369,6 +377,66 @@
                     android:textColor="#FFFFFF"
                     app:cornerRadius="15dp"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/dialogPlayerCount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E6000000"
+            android:gravity="center"
+            android:visibility="gone"
+            android:elevation="100dp">
+
+            <LinearLayout
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/neon_card_bg"
+                android:orientation="vertical"
+                android:padding="25dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PILIH JUMLAH PEMAIN"
+                    android:textColor="#00FFCC"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="25dp"/>
+
+                <Button
+                    android:id="@+id/btnOpt2"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="2 Players (3x3)"
+                    android:backgroundTint="#1A1A1A"
+                    android:textColor="#00FFCC"
+                    android:layout_marginBottom="12dp"
+                    app:cornerRadius="15dp"
+                    android:textAllCaps="false"/>
+
+                <Button
+                    android:id="@+id/btnOpt4"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="4 Players (6x6)"
+                    android:backgroundTint="#1A1A1A"
+                    android:textColor="#00FFCC"
+                    android:layout_marginBottom="12dp"
+                    app:cornerRadius="15dp"
+                    android:textAllCaps="false"/>
+
+                <Button
+                    android:id="@+id/btnOpt6"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="6 Players (10x10)"
+                    android:backgroundTint="#1A1A1A"
+                    android:textColor="#00FFCC"
+                    app:cornerRadius="15dp"
+                    android:textAllCaps="false"/>
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>
