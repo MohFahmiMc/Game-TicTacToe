@@ -21,8 +21,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvTurnStatus: TextView
     private lateinit var gameGrid: GridLayout
     private lateinit var splashLayout: RelativeLayout
+    private lateinit var dustEffect: ImageView
+    private lateinit var hellOverlay: View
     
-    // UPDATE: Simbol sesuai permintaanmu
     private val playerSymbols = arrayOf("X", "O", "A", "B", "C", "D")
     private val playerColors = arrayOf("#00FFCC", "#FF4444", "#FFBB33", "#99CC00", "#AA66CC", "#33B5E5")
     
@@ -43,10 +44,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Inisialisasi View
         viewFlipper = findViewById(R.id.viewFlipper)
         tvTurnStatus = findViewById(R.id.tvTurnStatus)
         gameGrid = findViewById(R.id.gameGrid)
         splashLayout = findViewById(R.id.splashLayout)
+        dustEffect = findViewById(R.id.dustEffect)
+        hellOverlay = findViewById(R.id.hellOverlay)
         
         scoreTextViews = arrayOf(
             findViewById(R.id.score_p1), findViewById(R.id.score_p2),
@@ -57,7 +61,8 @@ class MainActivity : AppCompatActivity() {
         loadScores()
         startSplashScreen()
         setupNavigation()
-        setupFlickerEffect() // Efek kedap-kedip neon
+        setupFlickerEffect() 
+        startDustAnimation() // Aktifkan debu melayang
     }
 
     private fun startSplashScreen() {
@@ -81,13 +86,14 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
-    // Efek lampu kedap-kedip di background
+    private fun startDustAnimation() {
+        val animDust = AnimationUtils.loadAnimation(this, R.anim.dust_move)
+        dustEffect.startAnimation(animDust)
+    }
+
     private fun setupFlickerEffect() {
-        val flicker = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
-        flicker.duration = 100
-        flicker.repeatCount = Animation.INFINITE
-        flicker.repeatMode = Animation.REVERSE
-        findViewById<RelativeLayout>(R.id.homeLayout).startAnimation(flicker)
+        val flicker = AnimationUtils.loadAnimation(this, R.anim.neon_flicker)
+        findViewById<TextView>(R.id.homeLayout).startAnimation(flicker)
     }
 
     private fun setupNavigation() {
@@ -153,11 +159,12 @@ class MainActivity : AppCompatActivity() {
         currentPlayerIndex = 0
         isTenseMode = false
         
-        // Sembunyikan efek merah jika ada
-        // findViewById<View>(R.id.hellOverlay)?.visibility = View.GONE
+        // Reset Visual Efek
+        hellOverlay.visibility = View.GONE
+        hellOverlay.clearAnimation()
 
         viewFlipper.displayedChild = 4 
-        startBGM(R.raw.backsound) // Putar musik awal
+        startBGM(R.raw.backsound) 
 
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
@@ -172,12 +179,13 @@ class MainActivity : AppCompatActivity() {
                     )
                     params.width = 0
                     params.height = 0
-                    params.setMargins(1, 1, 1, 1)
+                    params.setMargins(2, 2, 2, 2)
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size >= 10) 10f else 22sp.toFloat()
-                    setBackgroundColor(Color.BLACK)
+                    textSize = if (size >= 10) 12f else 22f
+                    setTextColor(Color.WHITE)
+                    setBackgroundResource(R.drawable.grid_item_bg) // Pastikan ada drawable ini
                     setOnClickListener { handleMove(this, i, j) }
                 }
                 gameGrid.addView(btn)
@@ -195,16 +203,22 @@ class MainActivity : AppCompatActivity() {
         btn.text = symbol
         btn.setTextColor(color)
         board[r][c] = symbol
-        btn.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+        
+        // Animasi muncul tombol
+        btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.button_pop))
 
-        // Play SFX per huruf (x.mp3, o.mp3, dkk)
+        // Play SFX per huruf
         playSFX(symbol.lowercase())
 
-        // Cek kondisi tegang (jika papan sudah terisi setengah)
-        if (!isTenseMode && board.flatten().count { it != null } > (currentBoardSize * currentBoardSize) / 2) {
+        // Cek Kondisi Tegang (Hell Mode)
+        val filledCells = board.flatten().count { it != null }
+        val triggerPoint = (currentBoardSize * currentBoardSize) / 2
+        
+        if (!isTenseMode && filledCells >= triggerPoint) {
             isTenseMode = true
             startBGM(R.raw.tense)
-            // Trigger efek visual merah di sini jika ada view-nya
+            hellOverlay.visibility = View.VISIBLE
+            hellOverlay.startAnimation(AnimationUtils.loadAnimation(this, R.anim.neon_flicker))
         }
 
         if (checkWin(r, c)) {
@@ -224,11 +238,14 @@ class MainActivity : AppCompatActivity() {
         updateTurnUI()
 
         if (vsRobot && currentPlayerIndex == 1) {
-            Handler(Looper.getMainLooper()).postDelayed({ robotMove() }, 600)
+            gameGrid.isEnabled = false
+            Handler(Looper.getMainLooper()).postDelayed({ 
+                robotMove() 
+                gameGrid.isEnabled = true
+            }, 600)
         }
     }
 
-    // --- AUDIO SYSTEM ---
     private fun startBGM(resId: Int) {
         bgmPlayer?.stop()
         bgmPlayer?.release()
@@ -253,7 +270,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // --- LOGIKA GAME (Tetap) ---
     private fun robotMove() {
         val emptyCells = mutableListOf<Pair<Int, Int>>()
         for (i in 0 until currentBoardSize) {
