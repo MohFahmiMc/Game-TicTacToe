@@ -38,7 +38,9 @@
         android:id="@+id/homeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_main_neon"> <ImageButton
+        android:background="@drawable/bg_main_neon"> 
+        
+        <ImageButton
             android:id="@+id/btnSettings"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -140,7 +142,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp"
-            android:background="@drawable/neon_card_bg"> <TextView
+            android:background="@drawable/neon_card_bg"> 
+            
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="SELECT MODE"
@@ -178,54 +182,83 @@
             android:id="@+id/cardLeaderboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_margin="15dp"
             app:cardCornerRadius="20dp"
             app:cardBackgroundColor="#111111"
             app:cardElevation="15dp">
-            <RelativeLayout
+            
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="15dp">
-                <TextView
-                    android:id="@+id/tvLeaderboard"
-                    android:layout_width="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="X: 0 | O: 0"
-                    android:textColor="#00FFCC"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_centerVertical="true"/>
-                <ImageButton
-                    android:id="@+id/btnResetScore"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentEnd="true"
-                    android:src="@drawable/ic_refresh"
-                    android:background="@android:color/transparent"
-                    app:tint="#FF4444"/>
-            </RelativeLayout>
+                    android:layout_marginBottom="8dp">
+                    <TextView
+                        android:id="@+id/tvTurnStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Giliran: P1"
+                        android:textColor="#00FFCC"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                    <ImageButton
+                        android:id="@+id/btnResetScore"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_alignParentEnd="true"
+                        android:src="@drawable/ic_refresh"
+                        android:background="@android:color/transparent"
+                        app:tint="#FF4444"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+                    <TextView android:id="@+id/score_p1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P1: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                    <TextView android:id="@+id/score_p2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P2: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                    <TextView android:id="@+id/score_p3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P3: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:weightSum="3">
+                    <TextView android:id="@+id/score_p4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P4: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                    <TextView android:id="@+id/score_p5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P5: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                    <TextView android:id="@+id/score_p6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P6: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
+                </LinearLayout>
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <GridLayout
             android:id="@+id/gameGrid"
-            android:layout_width="320dp"
-            android:layout_height="320dp"
+            android:layout_width="340dp"
+            android:layout_height="340dp"
             android:layout_centerInParent="true"
-            android:columnCount="3"
-            android:rowCount="3"
-            android:padding="4dp"
+            android:columnCount="10"
+            android:rowCount="10"
+            android:padding="2dp"
             android:background="@drawable/grid_neon_border"
-            android:elevation="20dp"/>
+            android:elevation="10dp"/>
 
         <Button
             android:id="@+id/btnExitGame"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="180dp"
+            android:layout_height="55dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="40dp"
-            android:text="QUIT"
+            android:layout_marginBottom="30dp"
+            android:text="QUIT GAME"
+            android:textStyle="bold"
             android:backgroundTint="#FF4444"
-            app:cornerRadius="20dp"/>
+            app:cornerRadius="25dp"/>
     </RelativeLayout>
 </ViewFlipper>
