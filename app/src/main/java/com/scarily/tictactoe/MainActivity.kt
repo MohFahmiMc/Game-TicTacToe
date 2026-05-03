@@ -1,14 +1,16 @@
 package com.scarily.tictactoe
 
-import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -23,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val playerSymbols = arrayOf("1", "2", "3", "4", "5", "6")
     private val playerColors = arrayOf("#00FFCC", "#FF4444", "#FFBB33", "#99CC00", "#AA66CC", "#33B5E5")
     
-    // Array Skor untuk 6 pemain
+    // Data Pemain & Skor
     private var playerScores = IntArray(6) { 0 }
     private lateinit var scoreTextViews: Array<TextView>
     
@@ -37,29 +39,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi View
+        // Inisialisasi View Utama
         viewFlipper = findViewById(R.id.viewFlipper)
         tvTurnStatus = findViewById(R.id.tvTurnStatus)
         gameGrid = findViewById(R.id.gameGrid)
         splashLayout = findViewById(R.id.splashLayout)
         
-        // Hubungkan 6 TextView Skor dari XML
+        // Hubungkan 6 TextView Skor
         scoreTextViews = arrayOf(
-            findViewById(R.id.score_p1),
-            findViewById(R.id.score_p2),
-            findViewById(R.id.score_p3),
-            findViewById(R.id.score_p4),
-            findViewById(R.id.score_p5),
-            findViewById(R.id.score_p6)
+            findViewById(R.id.score_p1), findViewById(R.id.score_p2),
+            findViewById(R.id.score_p3), findViewById(R.id.score_p4),
+            findViewById(R.id.score_p5), findViewById(R.id.score_p6)
         )
 
         val imgTeam = findViewById<ImageView>(R.id.imgLogoTeam)
         val imgMe = findViewById<ImageView>(R.id.imgLogoMe)
 
-        // Load Skor
         loadScores()
 
-        // SPLASH SCREEN
+        // Logika Splash Screen
         splashLayout.setBackgroundColor(Color.WHITE)
         imgTeam.alpha = 0f
         imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
@@ -80,28 +78,41 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
+        // Navigasi Menu
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { viewFlipper.displayedChild = 3 }
         findViewById<Button>(R.id.btnExitApp).setOnClickListener { finishAffinity() }
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { viewFlipper.displayedChild = 2 }
         findViewById<Button>(R.id.btnCloseSettings).setOnClickListener { viewFlipper.displayedChild = 1 }
 
+        // Link Developer (GitHub & Portfolio)
+        findViewById<ImageButton>(R.id.btnGithub).setOnClickListener {
+            openUrl("https://github.com/MohFahmiMc")
+        }
+        findViewById<ImageButton>(R.id.btnWeb).setOnClickListener {
+            openUrl("https://mifahmi.vercel.app/")
+        }
+
+        // Mode Game
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
             vsRobot = true
             totalPlayers = 2
             initGame(3) 
         }
-
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { showPlayerCountDialog() }
 
-        // RESET SKOR SEMUA PEMAIN
+        // Reset & Exit
         findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
             for (i in 0..5) playerScores[i] = 0
             saveScores()
             updateLeaderboardUI()
-            Toast.makeText(this, "Semua skor direset!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Skor direset!", Toast.LENGTH_SHORT).show()
         }
-        
         findViewById<Button>(R.id.btnExitGame).setOnClickListener { viewFlipper.displayedChild = 1 }
+    }
+
+    private fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
     }
 
     private fun showPlayerCountDialog() {
@@ -140,7 +151,6 @@ class MainActivity : AppCompatActivity() {
                     params.setMargins(1, 1, 1, 1)
                     layoutParams = params
                     
-                    // PERBAIKAN BIAR GAK TITIK-TITIK (...)
                     text = ""
                     textSize = if (size >= 10) 10f else 18f
                     setPadding(0, 0, 0, 0)
@@ -205,7 +215,7 @@ class MainActivity : AppCompatActivity() {
         val symbol = board[r][c]
         val winCondition = if (currentBoardSize >= 6) 4 else 3 
         
-        // Cek Horizontal
+        // Cek Horizontal & Vertical dengan Win Condition Dinamis
         var countH = 0
         for (j in 0 until currentBoardSize) {
             if (board[r][j] == symbol) {
@@ -214,7 +224,6 @@ class MainActivity : AppCompatActivity() {
             } else countH = 0
         }
 
-        // Cek Vertical
         var countV = 0
         for (i in 0 until currentBoardSize) {
             if (board[i][c] == symbol) {
@@ -226,22 +235,34 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
+    // LOGIKA CUSTOM WIN OVERLAY (MENGGANTIKAN ALERTDIALOG)
+    private fun showGameOver(result: String) {
+        val gameOverLayout = findViewById<RelativeLayout>(R.id.gameOverLayout)
+        val tvWinnerResult = findViewById<TextView>(R.id.tvWinnerResult)
+        val btnPlayAgain = findViewById<Button>(R.id.btnPlayAgain)
+        val btnBackToMenu = findViewById<Button>(R.id.btnBackToMenu)
+
+        tvWinnerResult.text = result
+        gameOverLayout.visibility = View.VISIBLE
+        gameOverLayout.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+
+        btnPlayAgain.setOnClickListener {
+            gameOverLayout.visibility = View.GONE
+            initGame(currentBoardSize)
+        }
+
+        btnBackToMenu.setOnClickListener {
+            gameOverLayout.visibility = View.GONE
+            viewFlipper.displayedChild = 1
+        }
+    }
+
     private fun updateTurnUI() {
         tvTurnStatus.text = "Giliran: P${playerSymbols[currentPlayerIndex]}"
         tvTurnStatus.setTextColor(Color.parseColor(playerColors[currentPlayerIndex]))
     }
 
     private fun isFull(): Boolean = board.all { row -> row.all { it != null } }
-
-    private fun showGameOver(result: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Permainan Berakhir")
-            .setMessage(result)
-            .setCancelable(false)
-            .setPositiveButton("Main Lagi") { _, _ -> initGame(currentBoardSize) }
-            .setNegativeButton("Menu Utama") { _, _ -> viewFlipper.displayedChild = 1 }
-            .show()
-    }
 
     private fun updateLeaderboardUI() {
         for (i in 0..5) {
