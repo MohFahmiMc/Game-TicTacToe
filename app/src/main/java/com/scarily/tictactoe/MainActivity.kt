@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     private var currentBoardSize = 3
     private var vsRobot = false
 
-    // Audio Variables
     private var bgmPlayer: MediaPlayer? = null
     private var isTenseMode = false
 
@@ -43,25 +42,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi View
-        viewFlipper = findViewById(R.id.viewFlipper)
-        tvTurnStatus = findViewById(R.id.tvTurnStatus)
-        gameGrid = findViewById(R.id.gameGrid)
-        splashLayout = findViewById(R.id.splashLayout)
-        dustEffect = findViewById(R.id.dustEffect)
-        hellOverlay = findViewById(R.id.hellOverlay)
-        
-        scoreTextViews = arrayOf(
-            findViewById(R.id.score_p1), findViewById(R.id.score_p2),
-            findViewById(R.id.score_p3), findViewById(R.id.score_p4),
-            findViewById(R.id.score_p5), findViewById(R.id.score_p6)
-        )
+        // Inisialisasi View dengan null-safety check (biar gak crash kalau ID salah)
+        try {
+            viewFlipper = findViewById(R.id.viewFlipper)
+            tvTurnStatus = findViewById(R.id.tvTurnStatus)
+            gameGrid = findViewById(R.id.gameGrid)
+            splashLayout = findViewById(R.id.splashLayout)
+            dustEffect = findViewById(R.id.dustEffect)
+            hellOverlay = findViewById(R.id.hellOverlay)
+            
+            scoreTextViews = arrayOf(
+                findViewById(R.id.score_p1), findViewById(R.id.score_p2),
+                findViewById(R.id.score_p3), findViewById(R.id.score_p4),
+                findViewById(R.id.score_p5), findViewById(R.id.score_p6)
+            )
 
-        loadScores()
-        startSplashScreen()
-        setupNavigation()
-        setupFlickerEffect() 
-        startDustAnimation()
+            loadScores()
+            startSplashScreen()
+            setupNavigation()
+            setupFlickerEffect() 
+            startDustAnimation()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error Inisialisasi: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun startSplashScreen() {
@@ -86,15 +89,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDustAnimation() {
-        // Memastikan file r.anim.dust_move ada
-        val animDust = AnimationUtils.loadAnimation(this, R.anim.dust_move)
-        dustEffect.startAnimation(animDust)
+        try {
+            val animDust = AnimationUtils.loadAnimation(this, R.anim.dust_move)
+            dustEffect.startAnimation(animDust)
+        } catch (e: Exception) { /* Animasi tidak ketemu */ }
     }
 
     private fun setupFlickerEffect() {
-        val flicker = AnimationUtils.loadAnimation(this, R.anim.neon_flicker)
-        // PERBAIKAN: Menggunakan findViewById yang benar sesuai ID layout utama kamu
-        findViewById<View>(R.id.homeLayout).startAnimation(flicker)
+        try {
+            val flicker = AnimationUtils.loadAnimation(this, R.anim.neon_flicker)
+            // Pakai ID layout utama (homeLayout) sesuai XML kamu
+            findViewById<View>(R.id.homeLayout)?.startAnimation(flicker)
+        } catch (e: Exception) { /* Animasi tidak ketemu */ }
     }
 
     private fun setupNavigation() {
@@ -133,7 +139,10 @@ class MainActivity : AppCompatActivity() {
     private fun showPlayerCountOverlay() {
         val dialogOverlay = findViewById<RelativeLayout>(R.id.dialogPlayerCount)
         dialogOverlay.visibility = View.VISIBLE
-        dialogOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+        
+        try {
+            dialogOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+        } catch (e: Exception) {}
 
         findViewById<Button>(R.id.btnOpt2).setOnClickListener {
             dialogOverlay.visibility = View.GONE
@@ -164,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         hellOverlay.clearAnimation()
 
         viewFlipper.displayedChild = 4 
-        startBGM(R.raw.backsound) // Pastikan file backsound.mp3 (kecil semua)
+        startBGM(R.raw.backsound) 
 
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
@@ -179,13 +188,12 @@ class MainActivity : AppCompatActivity() {
                     )
                     params.width = 0
                     params.height = 0
-                    params.setMargins(2, 2, 2, 2)
+                    params.setMargins(4, 4, 4, 4) // Margin ditambah biar kotak gak dempet
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size >= 10) 12f else 22f
+                    textSize = if (size >= 10) 10f else 22f
                     setTextColor(Color.WHITE)
-                    // PERBAIKAN: Pastikan file grid_item_bg.xml ada di res/drawable
                     setBackgroundResource(R.drawable.grid_item_bg) 
                     setOnClickListener { handleMove(this, i, j) }
                 }
@@ -205,10 +213,11 @@ class MainActivity : AppCompatActivity() {
         btn.setTextColor(color)
         board[r][c] = symbol
         
-        // Memastikan file r.anim.button_pop ada
-        btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.button_pop))
+        try {
+            btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.button_pop))
+        } catch (e: Exception) {}
 
-        // Play SFX (Huruf kecil semua agar sesuai nama file)
+        // Menggunakan simbol lowercase (x, o, a...) sesuai koreksi nama file resource
         playSFX(symbol.lowercase())
 
         val filledCells = board.flatten().count { it != null }
@@ -216,9 +225,11 @@ class MainActivity : AppCompatActivity() {
         
         if (!isTenseMode && filledCells >= triggerPoint) {
             isTenseMode = true
-            startBGM(R.raw.tense) // Pastikan file tense.mp3 (kecil semua)
+            startBGM(R.raw.tense)
             hellOverlay.visibility = View.VISIBLE
-            hellOverlay.startAnimation(AnimationUtils.loadAnimation(this, R.anim.neon_flicker))
+            try {
+                hellOverlay.startAnimation(AnimationUtils.loadAnimation(this, R.anim.neon_flicker))
+            } catch (e: Exception) {}
         }
 
         if (checkWin(r, c)) {
@@ -238,11 +249,7 @@ class MainActivity : AppCompatActivity() {
         updateTurnUI()
 
         if (vsRobot && currentPlayerIndex == 1) {
-            gameGrid.isEnabled = false
-            Handler(Looper.getMainLooper()).postDelayed({ 
-                robotMove() 
-                gameGrid.isEnabled = true
-            }, 600)
+            gameGrid.postDelayed({ robotMove() }, 600)
         }
     }
 
@@ -253,23 +260,28 @@ class MainActivity : AppCompatActivity() {
             bgmPlayer = MediaPlayer.create(this, resId)
             bgmPlayer?.isLooping = true
             bgmPlayer?.start()
-        } catch (e: Exception) { e.printStackTrace() }
+        } catch (e: Exception) { 
+            // Jangan crash kalau file audio hilang
+        }
     }
 
     private fun stopBGM() {
-        bgmPlayer?.stop()
-        bgmPlayer?.release()
+        bgmPlayer?.let {
+            it.stop()
+            it.release()
+        }
         bgmPlayer = null
     }
 
     private fun playSFX(name: String) {
-        // Mencari resource secara dinamis (nama file harus kecil semua)
         val resId = resources.getIdentifier(name, "raw", packageName)
         if (resId != 0) {
-            MediaPlayer.create(this, resId).apply {
-                setOnCompletionListener { release() }
-                start()
-            }
+            try {
+                MediaPlayer.create(this, resId).apply {
+                    setOnCompletionListener { release() }
+                    start()
+                }
+            } catch (e: Exception) {}
         }
     }
 
@@ -281,7 +293,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         if (emptyCells.isNotEmpty()) {
-            val move = emptyCells[Random().nextInt(emptyCells.size)]
+            val move = emptyCells.random()
             val index = move.first * currentBoardSize + move.second
             val childBtn = gameGrid.getChildAt(index) as? Button
             childBtn?.let { handleMove(it, move.first, move.second) }
@@ -361,7 +373,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openUrl(url: String) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: Exception) {
+            Toast.makeText(this, "Browser tidak ditemukan", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroy() {
