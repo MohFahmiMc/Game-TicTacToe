@@ -3,11 +3,13 @@ package com.scarily.tictactoe
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +22,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameGrid: GridLayout
     private lateinit var splashLayout: RelativeLayout
     
-    private val playerSymbols = arrayOf("1", "2", "3", "4", "5", "6")
+    // UPDATE: Simbol sesuai permintaanmu
+    private val playerSymbols = arrayOf("X", "O", "A", "B", "C", "D")
     private val playerColors = arrayOf("#00FFCC", "#FF4444", "#FFBB33", "#99CC00", "#AA66CC", "#33B5E5")
     
     private var playerScores = IntArray(6) { 0 }
@@ -32,11 +35,14 @@ class MainActivity : AppCompatActivity() {
     private var currentBoardSize = 3
     private var vsRobot = false
 
+    // Audio Variables
+    private var bgmPlayer: MediaPlayer? = null
+    private var isTenseMode = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi View
         viewFlipper = findViewById(R.id.viewFlipper)
         tvTurnStatus = findViewById(R.id.tvTurnStatus)
         gameGrid = findViewById(R.id.gameGrid)
@@ -51,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         loadScores()
         startSplashScreen()
         setupNavigation()
+        setupFlickerEffect() // Efek kedap-kedip neon
     }
 
     private fun startSplashScreen() {
@@ -61,46 +68,48 @@ class MainActivity : AppCompatActivity() {
         imgTeam.alpha = 0f
         imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
             Handler(Looper.getMainLooper()).postDelayed({
-                splashLayout.setBackgroundColor(Color.parseColor("#333333"))
+                splashLayout.setBackgroundColor(Color.parseColor("#050505"))
                 imgTeam.visibility = View.GONE
                 imgMe.visibility = View.VISIBLE
                 imgMe.alpha = 0f
                 imgMe.animate().alpha(1f).setDuration(1000).withEndAction {
                     Handler(Looper.getMainLooper()).postDelayed({
-                        viewFlipper.displayedChild = 1 // Masuk ke Home
+                        viewFlipper.displayedChild = 1 
                     }, 1000)
                 }.start()
             }, 1000)
         }.start()
     }
 
+    // Efek lampu kedap-kedip di background
+    private fun setupFlickerEffect() {
+        val flicker = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
+        flicker.duration = 100
+        flicker.repeatCount = Animation.INFINITE
+        flicker.repeatMode = Animation.REVERSE
+        findViewById<RelativeLayout>(R.id.homeLayout).startAnimation(flicker)
+    }
+
     private fun setupNavigation() {
-        // Navigasi Utama
-        findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { 
-            viewFlipper.displayedChild = 3 // Pergi ke PILIH MODE
-        }
-        
+        findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { viewFlipper.displayedChild = 3 }
         findViewById<Button>(R.id.btnExitApp).setOnClickListener { finishAffinity() }
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { viewFlipper.displayedChild = 2 }
         findViewById<Button>(R.id.btnCloseSettings).setOnClickListener { viewFlipper.displayedChild = 1 }
 
-        // Social Media
         findViewById<ImageButton>(R.id.btnGithub).setOnClickListener { openUrl("https://github.com/MohFahmiMc") }
         findViewById<ImageButton>(R.id.btnWeb).setOnClickListener { openUrl("https://mifahmi.vercel.app/") }
 
-        // LOGIKA PEMILIHAN MODE (DI HALAMAN CHILD 3)
         findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
             vsRobot = true
             totalPlayers = 2
-            initGame(3) // Robot selalu 3x3
+            initGame(3) 
         }
 
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
             vsRobot = false
-            showPlayerCountOverlay() // Panggil overlay pemilihan jumlah pemain
+            showPlayerCountOverlay() 
         }
 
-        // Kontrol Game
         findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
             for (i in 0..5) playerScores[i] = 0
             saveScores()
@@ -109,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
         
         findViewById<Button>(R.id.btnExitGame).setOnClickListener { 
+            stopBGM()
             viewFlipper.displayedChild = 1 
         }
     }
@@ -118,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         dialogOverlay.visibility = View.VISIBLE
         dialogOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
 
-        // Set Click Listener di dalam overlay agar tidak tumpang tindih
         findViewById<Button>(R.id.btnOpt2).setOnClickListener {
             dialogOverlay.visibility = View.GONE
             totalPlayers = 2
@@ -142,9 +151,13 @@ class MainActivity : AppCompatActivity() {
         currentBoardSize = size
         board = Array(size) { arrayOfNulls<String>(size) }
         currentPlayerIndex = 0
+        isTenseMode = false
         
-        // PINDAH KE LAYAR GAME (CHILD 4)
+        // Sembunyikan efek merah jika ada
+        // findViewById<View>(R.id.hellOverlay)?.visibility = View.GONE
+
         viewFlipper.displayedChild = 4 
+        startBGM(R.raw.backsound) // Putar musik awal
 
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
@@ -163,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size >= 10) 10f else 18f
+                    textSize = if (size >= 10) 10f else 22sp.toFloat()
                     setBackgroundColor(Color.BLACK)
                     setOnClickListener { handleMove(this, i, j) }
                 }
@@ -172,9 +185,6 @@ class MainActivity : AppCompatActivity() {
         }
         updateTurnUI()
     }
-
-    // --- LOGIKA PERMAINAN (checkWin, handleMove, robotMove tetap sama) ---
-    // ... (Gunakan logika checkWin diagonal yang saya berikan sebelumnya agar tidak bug)
 
     private fun handleMove(btn: Button, r: Int, c: Int) {
         if (btn.text.isNotEmpty()) return
@@ -186,6 +196,16 @@ class MainActivity : AppCompatActivity() {
         btn.setTextColor(color)
         board[r][c] = symbol
         btn.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
+
+        // Play SFX per huruf (x.mp3, o.mp3, dkk)
+        playSFX(symbol.lowercase())
+
+        // Cek kondisi tegang (jika papan sudah terisi setengah)
+        if (!isTenseMode && board.flatten().count { it != null } > (currentBoardSize * currentBoardSize) / 2) {
+            isTenseMode = true
+            startBGM(R.raw.tense)
+            // Trigger efek visual merah di sini jika ada view-nya
+        }
 
         if (checkWin(r, c)) {
             playerScores[currentPlayerIndex]++
@@ -208,6 +228,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // --- AUDIO SYSTEM ---
+    private fun startBGM(resId: Int) {
+        bgmPlayer?.stop()
+        bgmPlayer?.release()
+        bgmPlayer = MediaPlayer.create(this, resId)
+        bgmPlayer?.isLooping = true
+        bgmPlayer?.start()
+    }
+
+    private fun stopBGM() {
+        bgmPlayer?.stop()
+        bgmPlayer?.release()
+        bgmPlayer = null
+    }
+
+    private fun playSFX(name: String) {
+        val resId = resources.getIdentifier(name, "raw", packageName)
+        if (resId != 0) {
+            MediaPlayer.create(this, resId).apply {
+                setOnCompletionListener { release() }
+                start()
+            }
+        }
+    }
+
+    // --- LOGIKA GAME (Tetap) ---
     private fun robotMove() {
         val emptyCells = mutableListOf<Pair<Int, Int>>()
         for (i in 0 until currentBoardSize) {
@@ -248,13 +294,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showGameOver(result: String) {
+        stopBGM()
         val gameOverLayout = findViewById<RelativeLayout>(R.id.gameOverLayout)
         val tvWinnerResult = findViewById<TextView>(R.id.tvWinnerResult)
         
         tvWinnerResult.text = result
         gameOverLayout.visibility = View.VISIBLE
-        gameOverLayout.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
-
+        
         findViewById<Button>(R.id.btnPlayAgain).setOnClickListener {
             gameOverLayout.visibility = View.GONE
             initGame(currentBoardSize)
@@ -267,7 +313,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateTurnUI() {
-        tvTurnStatus.text = "Giliran: P${playerSymbols[currentPlayerIndex]}"
+        tvTurnStatus.text = "Giliran: ${playerSymbols[currentPlayerIndex]}"
         tvTurnStatus.setTextColor(Color.parseColor(playerColors[currentPlayerIndex]))
     }
 
@@ -275,7 +321,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateLeaderboardUI() {
         for (i in 0..5) {
-            scoreTextViews[i].text = "P${i + 1}: ${playerScores[i]}"
+            scoreTextViews[i].text = "${playerSymbols[i]}: ${playerScores[i]}"
         }
     }
 
@@ -297,5 +343,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun openUrl(url: String) {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+
+    override fun onDestroy() {
+        stopBGM()
+        super.onDestroy()
     }
 }
