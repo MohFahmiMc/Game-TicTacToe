@@ -243,6 +243,14 @@
         android:layout_height="match_parent"
         android:background="#050505">
 
+        <ImageView
+            android:id="@+id/dustEffect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/dust_particles"
+            android:alpha="0.3"
+            android:scaleType="centerCrop"/>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardLeaderboard"
             android:layout_width="match_parent"
@@ -312,6 +320,14 @@
             android:padding="2dp"
             android:background="@drawable/grid_neon_border"
             android:elevation="10dp"/>
+
+        <View
+            android:id="@+id/hellOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_hell"
+            android:visibility="gone"
+            android:elevation="50dp"/>
 
         <Button
             android:id="@+id/btnExitGame"
