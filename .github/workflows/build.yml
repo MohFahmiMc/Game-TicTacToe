@@ -1,4 +1,5 @@
 name: Scarily TicTacToe Build
+
 on:
   push:
     branches:
@@ -22,17 +23,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
-          cache: gradle
 
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
+      # Kita pakai perintah 'gradle' langsung, bukan './gradlew'
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Scarily-TicTacToe-Debug
+          name: Scarily-TicTacToe-APK
           path: app/build/outputs/apk/debug/app-debug.apk
-          
