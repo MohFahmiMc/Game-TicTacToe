@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -62,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         startSplashScreen()
         setupNavigation()
         setupFlickerEffect() 
-        startDustAnimation() // Aktifkan debu melayang
+        startDustAnimation()
     }
 
     private fun startSplashScreen() {
@@ -87,13 +86,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDustAnimation() {
+        // Memastikan file r.anim.dust_move ada
         val animDust = AnimationUtils.loadAnimation(this, R.anim.dust_move)
         dustEffect.startAnimation(animDust)
     }
 
     private fun setupFlickerEffect() {
         val flicker = AnimationUtils.loadAnimation(this, R.anim.neon_flicker)
-        findViewById<TextView>(R.id.homeLayout).startAnimation(flicker)
+        // PERBAIKAN: Menggunakan findViewById yang benar sesuai ID layout utama kamu
+        findViewById<View>(R.id.homeLayout).startAnimation(flicker)
     }
 
     private fun setupNavigation() {
@@ -159,12 +160,11 @@ class MainActivity : AppCompatActivity() {
         currentPlayerIndex = 0
         isTenseMode = false
         
-        // Reset Visual Efek
         hellOverlay.visibility = View.GONE
         hellOverlay.clearAnimation()
 
         viewFlipper.displayedChild = 4 
-        startBGM(R.raw.backsound) 
+        startBGM(R.raw.backsound) // Pastikan file backsound.mp3 (kecil semua)
 
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
@@ -185,7 +185,8 @@ class MainActivity : AppCompatActivity() {
                     text = ""
                     textSize = if (size >= 10) 12f else 22f
                     setTextColor(Color.WHITE)
-                    setBackgroundResource(R.drawable.grid_item_bg) // Pastikan ada drawable ini
+                    // PERBAIKAN: Pastikan file grid_item_bg.xml ada di res/drawable
+                    setBackgroundResource(R.drawable.grid_item_bg) 
                     setOnClickListener { handleMove(this, i, j) }
                 }
                 gameGrid.addView(btn)
@@ -204,19 +205,18 @@ class MainActivity : AppCompatActivity() {
         btn.setTextColor(color)
         board[r][c] = symbol
         
-        // Animasi muncul tombol
+        // Memastikan file r.anim.button_pop ada
         btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.button_pop))
 
-        // Play SFX per huruf
+        // Play SFX (Huruf kecil semua agar sesuai nama file)
         playSFX(symbol.lowercase())
 
-        // Cek Kondisi Tegang (Hell Mode)
         val filledCells = board.flatten().count { it != null }
         val triggerPoint = (currentBoardSize * currentBoardSize) / 2
         
         if (!isTenseMode && filledCells >= triggerPoint) {
             isTenseMode = true
-            startBGM(R.raw.tense)
+            startBGM(R.raw.tense) // Pastikan file tense.mp3 (kecil semua)
             hellOverlay.visibility = View.VISIBLE
             hellOverlay.startAnimation(AnimationUtils.loadAnimation(this, R.anim.neon_flicker))
         }
@@ -247,11 +247,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBGM(resId: Int) {
-        bgmPlayer?.stop()
-        bgmPlayer?.release()
-        bgmPlayer = MediaPlayer.create(this, resId)
-        bgmPlayer?.isLooping = true
-        bgmPlayer?.start()
+        try {
+            bgmPlayer?.stop()
+            bgmPlayer?.release()
+            bgmPlayer = MediaPlayer.create(this, resId)
+            bgmPlayer?.isLooping = true
+            bgmPlayer?.start()
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     private fun stopBGM() {
@@ -261,6 +263,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playSFX(name: String) {
+        // Mencari resource secara dinamis (nama file harus kecil semua)
         val resId = resources.getIdentifier(name, "raw", packageName)
         if (resId != 0) {
             MediaPlayer.create(this, resId).apply {
