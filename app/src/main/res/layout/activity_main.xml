@@ -71,8 +71,6 @@
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:shadowColor="#00FFCC"
-                android:shadowDx="0"
-                android:shadowDy="0"
                 android:shadowRadius="15"/>
 
             <Button
@@ -106,7 +104,9 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="30dp"
-        android:background="#0A0A0A">
+        android:background="#0A0A0A"
+        android:gravity="center_horizontal">
+        
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -114,21 +114,84 @@
             android:textColor="#00FFCC"
             android:textSize="28sp"
             android:textStyle="bold"/>
+            
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333" android:layout_marginVertical="20dp"/>
-        <TextView
-            android:layout_width="wrap_content"
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dev: Mohfahmi"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"/>
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="#151515"
+            android:layout_marginBottom="20dp">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/logome"
+                    android:scaleType="centerCrop"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MohFahmiMc"
+                    android:textColor="#00FFCC"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Android Developer"
+                    android:textColor="#888"
+                    android:textSize="14sp"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp">
+
+                    <ImageButton
+                        android:id="@+id/btnGithub"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_github"
+                        android:background="@drawable/circle_neon_btn"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        app:tint="#FFFFFF"
+                        android:layout_marginEnd="15dp"/>
+
+                    <ImageButton
+                        android:id="@+id/btnWeb"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_web"
+                        android:background="@drawable/circle_neon_btn"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        app:tint="#00FFCC"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <Button
             android:id="@+id/btnCloseSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:text="BACK"
             android:backgroundTint="#00FFCC"
-            android:textColor="#000000"/>
+            android:textColor="#000000"
+            app:cornerRadius="15dp"/>
     </LinearLayout>
 
     <RelativeLayout
@@ -136,14 +199,12 @@
         android:layout_height="match_parent"
         android:background="#E6000000"
         android:gravity="center">
-
         <LinearLayout
             android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp"
             android:background="@drawable/neon_card_bg"> 
-            
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -153,7 +214,6 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="30dp"/>
-
             <Button
                 android:id="@+id/btnModeRobot"
                 android:layout_width="match_parent"
@@ -162,7 +222,6 @@
                 android:backgroundTint="#007BFF"
                 app:cornerRadius="15dp"
                 android:layout_marginBottom="15dp"/>
-
             <Button
                 android:id="@+id/btnModeFriends"
                 android:layout_width="match_parent"
@@ -186,13 +245,11 @@
             app:cardCornerRadius="20dp"
             app:cardBackgroundColor="#111111"
             app:cardElevation="15dp">
-            
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp">
-
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -214,7 +271,6 @@
                         android:background="@android:color/transparent"
                         app:tint="#FF4444"/>
                 </RelativeLayout>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -224,7 +280,6 @@
                     <TextView android:id="@+id/score_p2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P2: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                     <TextView android:id="@+id/score_p3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="P3: 0" android:textColor="#FFF" android:textSize="12sp" android:gravity="center"/>
                 </LinearLayout>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -260,5 +315,61 @@
             android:textStyle="bold"
             android:backgroundTint="#FF4444"
             app:cornerRadius="25dp"/>
+
+        <RelativeLayout
+            android:id="@+id/gameOverLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E6000000"
+            android:gravity="center"
+            android:visibility="gone"
+            android:elevation="50dp">
+            <LinearLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/neon_card_bg"
+                android:orientation="vertical"
+                android:padding="25dp"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GAME OVER"
+                    android:textColor="#FF4444"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:shadowColor="#FF4444"
+                    android:shadowRadius="10"/>
+                <TextView
+                    android:id="@+id/tvWinnerResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pemain 1 Menang!"
+                    android:textColor="#00FFCC"
+                    android:textSize="20sp"
+                    android:layout_marginTop="10dp"
+                    android:textAlignment="center"/>
+                <Button
+                    android:id="@+id/btnPlayAgain"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="30dp"
+                    android:text="MAIN LAGI"
+                    android:backgroundTint="#00FFCC"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    app:cornerRadius="15dp"/>
+                <Button
+                    android:id="@+id/btnBackToMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="10dp"
+                    android:text="MENU UTAMA"
+                    android:backgroundTint="#222222"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="15dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </ViewFlipper>
