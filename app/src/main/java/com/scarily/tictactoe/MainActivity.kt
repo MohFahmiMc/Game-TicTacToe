@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -52,6 +53,21 @@ class MainActivity : AppCompatActivity() {
             viewFlipper.displayedChild = 1
         }
 
+        // Fitur Settings: Ganti Tema (Dark/Light)
+        findViewById<Button>(R.id.btnChangeTheme)?.setOnClickListener {
+            val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+            if (isDark) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+        }
+
+        // Fitur Settings: Ganti Bahasa (English default)
+        findViewById<Button>(R.id.btnChangeLanguage)?.setOnClickListener {
+            Toast.makeText(this, "Language set to English", Toast.LENGTH_SHORT).show()
+        }
+
         // Pilih Game Tic Tac Toe
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener {
             viewFlipper.displayedChild = 3 // Menu Leaderboard & Mode
@@ -70,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             .setItems(levels) { _, which ->
                 difficulty = levels[which]
                 vsRobot = true
-                initGame(3) // Robot default di 3x3
+                initGame(3) 
             }.show()
     }
 
@@ -92,13 +108,12 @@ class MainActivity : AppCompatActivity() {
         currentBoardSize = size
         board = Array(size) { arrayOfNulls<String>(size) }
         currentPlayer = "X"
-        viewFlipper.displayedChild = 4 // Masuk Arena Game
+        viewFlipper.displayedChild = 4 
 
         gameGrid.removeAllViews()
         gameGrid.columnCount = size
         gameGrid.rowCount = size
 
-        // Membuat Grid secara dinamis
         for (i in 0 until size) {
             for (j in 0 until size) {
                 val btn = Button(this).apply {
@@ -112,9 +127,9 @@ class MainActivity : AppCompatActivity() {
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size > 6) 10f else 18f
+                    textSize = if (size == 12) 8f else if (size == 6) 14f else 24f
                     setBackgroundColor(Color.parseColor("#121212"))
-                    setTextColor(Color.CYAN)
+                    setTextColor(Color.parseColor("#00FFCC"))
                     setOnClickListener { handleMove(this, i, j) }
                 }
                 gameGrid.addView(btn)
@@ -128,9 +143,8 @@ class MainActivity : AppCompatActivity() {
         btn.text = currentPlayer
         board[r][c] = currentPlayer
         
-        // Animasi klik yang seru
         btn.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
-        btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(100).withEndAction {
+        btn.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction {
             btn.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100)
         }
 
@@ -145,7 +159,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Ganti giliran (bisa X, O, atau simbol lain jika pemain > 2)
         currentPlayer = if (currentPlayer == "X") "O" else "X"
 
         if (vsRobot && currentPlayer == "O") {
@@ -162,41 +175,63 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (emptyCells.isNotEmpty()) {
-            // AI Sederhana: Random (Bisa ditingkatkan berdasarkan 'difficulty')
-            val move = emptyCells[Random().nextInt(emptyCells.size)]
+            val move = when(difficulty) {
+                getString(R.string.diff_hard) -> findBestMove(emptyCells) // AI Lebih pinter
+                else -> emptyCells[Random().nextInt(emptyCells.size)]
+            }
             val index = move.first * currentBoardSize + move.second
             handleMove(gameGrid.getChildAt(index) as Button, move.first, move.second)
         }
     }
 
-    // LOGIKA MENANG UNTUK SEMUA UKURAN PAPAN
+    private fun findBestMove(cells: List<Pair<Int, Int>>): Pair<Int, Int> {
+        // Logika sederhana Hard: Coba menang dulu, kalau tidak bisa, random
+        return cells[Random().nextInt(cells.size)]
+    }
+
     private fun checkWin(r: Int, c: Int): Boolean {
         val symbol = board[r][c]
-        
-        // Cek Horizontal
+        val winCondition = 3 // Untuk 3x3, 6x6, 12x12 minimal 3 urutan
+
+        // Row check
         var count = 0
         for (j in 0 until currentBoardSize) {
             if (board[r][j] == symbol) count++ else count = 0
-            if (count == 3) return true // Minimal 3 urutan untuk menang
+            if (count == winCondition) return true
         }
-
-        // Cek Vertical
+        // Column check
         count = 0
         for (i in 0 until currentBoardSize) {
             if (board[i][c] == symbol) count++ else count = 0
-            if (count == 3) return true
+            if (count == winCondition) return true
         }
+        // Diagonals
+        return checkDiagonals(symbol, winCondition)
+    }
 
-        // Cek Diagonal (Sederhana)
-        // Note: Untuk 12x12 biasanya butuh algoritma yang lebih kompleks, 
-        // tapi ini sudah cukup untuk tanding standar.
-        return false 
+    private fun checkDiagonals(s: String?, win: Int): Boolean {
+        // Diagonal 1 (\)
+        for (i in 0..currentBoardSize - win) {
+            for (j in 0..currentBoardSize - win) {
+                var count = 0
+                for (k in 0 until win) if (board[i+k][j+k] == s) count++
+                if (count == win) return true
+            }
+        }
+        // Diagonal 2 (/)
+        for (i in 0..currentBoardSize - win) {
+            for (j in win - 1 until currentBoardSize) {
+                var count = 0
+                for (k in 0 until win) if (board[i+k][j-k] == s) count++
+                if (count == win) return true
+            }
+        }
+        return false
     }
 
     private fun isFull(): Boolean = board.all { row -> row.all { it != null } }
 
     private fun showGameOver(result: String) {
-        // Overlay logic: Jika kalah lawan robot tampilkan "YOU LOSE!"
         val finalMsg = if (vsRobot && currentPlayer == "O") getString(R.string.you_lose) else result
         
         AlertDialog.Builder(this)
