@@ -10,27 +10,36 @@
         android:id="@+id/splashLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF">
-        <androidx.cardview.widget.CardView
-            android:layout_width="250dp"
-            android:layout_height="250dp"
+        android:background="#050505"> <androidx.cardview.widget.CardView
+            android:layout_width="180dp" 
+            android:layout_height="180dp"
             android:layout_centerInParent="true"
-            app:cardCornerRadius="60dp"
-            app:cardElevation="20dp"
-            app:cardBackgroundColor="@android:color/transparent">
-            <ImageView
-                android:id="@+id/imgLogoTeam"
+            app:cardCornerRadius="40dp"
+            app:cardElevation="10dp">
+            
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/logoteam"
-                android:scaleType="centerCrop" />
-            <ImageView
-                android:id="@+id/imgLogoMe"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/logome"
-                android:scaleType="centerCrop"
-                android:visibility="gone" />
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imgLogoTeam"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/logoteam"
+                    android:background="#FFFFFF"
+                    android:padding="20dp"
+                    android:scaleType="fitCenter" />
+
+                <ImageView
+                    android:id="@+id/imgLogoMe"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/logome"
+                    android:background="#E0E0E0"
+                    android:padding="20dp"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
+            </RelativeLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
@@ -38,7 +47,7 @@
         android:id="@+id/homeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_main_neon"> 
+        android:background="#050505"> 
         
         <ImageButton
             android:id="@+id/btnSettings"
@@ -61,8 +70,8 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:src="@drawable/logoapp"
                 android:elevation="15dp"
                 android:layout_marginBottom="20dp"/>
@@ -72,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:text="NEON TIC TAC TOE"
                 android:textColor="#00FFCC"
-                android:textSize="34sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
                 android:shadowColor="#00FFCC"
                 android:shadowRadius="20"
@@ -330,14 +339,6 @@
             android:background="@drawable/grid_neon_border"
             android:elevation="10dp"/>
 
-        <View
-            android:id="@+id/hellOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/gradient_hell"
-            android:visibility="gone"
-            android:elevation="20dp"/>
-
         <Button
             android:id="@+id/btnExitGame"
             android:layout_width="180dp"
@@ -359,7 +360,6 @@
             android:gravity="center"
             android:visibility="gone"
             android:elevation="150dp">
-
             <LinearLayout
                 android:layout_width="320dp"
                 android:layout_height="wrap_content"
@@ -367,17 +367,13 @@
                 android:orientation="vertical"
                 android:padding="30dp"
                 android:gravity="center">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PERMAINAN BERAKHIR"
                     android:textColor="#FF4444"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:shadowColor="#FF4444"
-                    android:shadowRadius="15"/>
-
+                    android:textStyle="bold"/>
                 <TextView
                     android:id="@+id/tvWinnerResult"
                     android:layout_width="wrap_content"
@@ -386,9 +382,7 @@
                     android:textColor="#00FFCC"
                     android:textSize="20sp"
                     android:layout_marginTop="20dp"
-                    android:textAlignment="center"
                     android:textStyle="bold"/>
-
                 <Button
                     android:id="@+id/btnPlayAgain"
                     android:layout_width="match_parent"
@@ -399,7 +393,6 @@
                     android:textColor="#000000"
                     android:textStyle="bold"
                     app:cornerRadius="15dp"/>
-
                 <Button
                     android:id="@+id/btnBackToMenu"
                     android:layout_width="match_parent"
@@ -420,7 +413,6 @@
             android:gravity="center"
             android:visibility="gone"
             android:elevation="170dp">
-
             <LinearLayout
                 android:layout_width="320dp"
                 android:layout_height="wrap_content"
@@ -428,7 +420,6 @@
                 android:orientation="vertical"
                 android:padding="30dp"
                 android:gravity="center">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -437,7 +428,6 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="30dp"/>
-
                 <Button
                     android:id="@+id/btnOpt2"
                     android:layout_width="match_parent"
@@ -446,10 +436,7 @@
                     android:backgroundTint="#1A1A1A"
                     android:textColor="#00FFCC"
                     android:layout_marginBottom="15dp"
-                    app:cornerRadius="15dp"
-                    android:textStyle="bold"
-                    android:textAllCaps="false"/>
-
+                    app:cornerRadius="15dp"/>
                 <Button
                     android:id="@+id/btnOpt4"
                     android:layout_width="match_parent"
@@ -458,10 +445,7 @@
                     android:backgroundTint="#1A1A1A"
                     android:textColor="#00FFCC"
                     android:layout_marginBottom="15dp"
-                    app:cornerRadius="15dp"
-                    android:textStyle="bold"
-                    android:textAllCaps="false"/>
-
+                    app:cornerRadius="15dp"/>
                 <Button
                     android:id="@+id/btnOpt6"
                     android:layout_width="match_parent"
@@ -469,9 +453,7 @@
                     android:text="6 Players (10x10)"
                     android:backgroundTint="#1A1A1A"
                     android:textColor="#00FFCC"
-                    app:cornerRadius="15dp"
-                    android:textStyle="bold"
-                    android:textAllCaps="false"/>
+                    app:cornerRadius="15dp"/>
             </LinearLayout>
         </RelativeLayout>
 
@@ -483,7 +465,6 @@
             android:gravity="center"
             android:visibility="gone"
             android:elevation="180dp">
-
             <LinearLayout
                 android:layout_width="320dp"
                 android:layout_height="wrap_content"
@@ -491,7 +472,6 @@
                 android:orientation="vertical"
                 android:padding="30dp"
                 android:gravity="center">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -500,38 +480,30 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="30dp"/>
-
                 <Button
                     android:id="@+id/btnEasy"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
-                    android:text="EASY (BOT NGASAL)"
+                    android:text="EASY"
                     android:backgroundTint="#28A745"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginBottom="15dp"
                     app:cornerRadius="15dp"
-                    android:textStyle="bold"/>
-
+                    android:layout_marginBottom="15dp"/>
                 <Button
                     android:id="@+id/btnNormal"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
-                    android:text="NORMAL (BOT LUMAYAN)"
+                    android:text="NORMAL"
                     android:backgroundTint="#FFC107"
                     android:textColor="#000000"
-                    android:layout_marginBottom="15dp"
                     app:cornerRadius="15dp"
-                    android:textStyle="bold"/>
-
+                    android:layout_marginBottom="15dp"/>
                 <Button
                     android:id="@+id/btnHard"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
-                    android:text="HARD (BOT DEWA)"
+                    android:text="HARD"
                     android:backgroundTint="#DC3545"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="15dp"
-                    android:textStyle="bold"/>
+                    app:cornerRadius="15dp"/>
             </LinearLayout>
         </RelativeLayout>
 
