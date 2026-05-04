@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameGrid: GridLayout
     private lateinit var splashLayout: RelativeLayout
     private lateinit var dustEffect: ImageView
-    private lateinit var hellOverlay: View
     
     private val playerSymbols = arrayOf("X", "O", "A", "B", "C", "D")
     private val playerColors = arrayOf("#00FFCC", "#FF4444", "#FFBB33", "#99CC00", "#AA66CC", "#33B5E5")
@@ -34,10 +33,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var board: Array<Array<String?>>
     private var currentBoardSize = 3
     private var vsRobot = false
-    private var difficulty = "easy" // Default difficulty
+    private var difficulty = "easy"
 
     private var bgmPlayer: MediaPlayer? = null
-    private var isTenseMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +47,6 @@ class MainActivity : AppCompatActivity() {
             gameGrid = findViewById(R.id.gameGrid)
             splashLayout = findViewById(R.id.splashLayout)
             dustEffect = findViewById(R.id.dustEffect)
-            hellOverlay = findViewById(R.id.hellOverlay)
             
             scoreTextViews = arrayOf(
                 findViewById(R.id.score_p1), findViewById(R.id.score_p2),
@@ -62,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             setupNavigation()
             startDustAnimation()
         } catch (e: Exception) {
-            Toast.makeText(this, "Error Inisialisasi: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Inisialisasi Gagal: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -70,18 +67,20 @@ class MainActivity : AppCompatActivity() {
         val imgTeam = findViewById<ImageView>(R.id.imgLogoTeam)
         val imgMe = findViewById<ImageView>(R.id.imgLogoMe)
         
-        splashLayout.setBackgroundColor(Color.WHITE)
+        // Awal: Logo Team (Background Putih sudah di XML)
         imgTeam.alpha = 0f
-        imgTeam.animate().alpha(1f).setDuration(1000).withEndAction {
+        imgTeam.animate().alpha(1f).setDuration(1200).withEndAction {
             Handler(Looper.getMainLooper()).postDelayed({
-                splashLayout.setBackgroundColor(Color.parseColor("#050505"))
+                // Transisi ke Logo Me (Warna Abu-abu sesuai permintaan)
                 imgTeam.visibility = View.GONE
                 imgMe.visibility = View.VISIBLE
                 imgMe.alpha = 0f
+                // Efek fade in untuk logo me
                 imgMe.animate().alpha(1f).setDuration(1000).withEndAction {
                     Handler(Looper.getMainLooper()).postDelayed({
+                        // Pindah ke Menu Utama (Child 1)
                         viewFlipper.displayedChild = 1 
-                    }, 1000)
+                    }, 1200)
                 }.start()
             }, 1000)
         }.start()
@@ -95,24 +94,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
+        // Navigasi Menu
         findViewById<Button>(R.id.btnGameTicTacToe).setOnClickListener { viewFlipper.displayedChild = 3 }
         findViewById<Button>(R.id.btnExitApp).setOnClickListener { finishAffinity() }
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener { viewFlipper.displayedChild = 2 }
         findViewById<Button>(R.id.btnCloseSettings).setOnClickListener { viewFlipper.displayedChild = 1 }
 
+        // Sosial Media
         findViewById<ImageButton>(R.id.btnGithub).setOnClickListener { openUrl("https://github.com/MohFahmiMc") }
         findViewById<ImageButton>(R.id.btnWeb).setOnClickListener { openUrl("https://mifahmi.vercel.app/") }
 
-        // UPDATE: Sekarang tombol Robot memicu Dialog Difficulty
-        findViewById<Button>(R.id.btnModeRobot).setOnClickListener { 
-            showDifficultyOverlay()
-        }
-
+        // Mode Game
+        findViewById<Button>(R.id.btnModeRobot).setOnClickListener { showDifficultyOverlay() }
         findViewById<Button>(R.id.btnModeFriends).setOnClickListener { 
             vsRobot = false
             showPlayerCountOverlay() 
         }
 
+        // Skor
         findViewById<ImageButton>(R.id.btnResetScore).setOnClickListener {
             for (i in 0..5) playerScores[i] = 0
             saveScores()
@@ -126,56 +125,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // UPDATE: Fungsi untuk handle pilihan Difficulty
     private fun showDifficultyOverlay() {
         val difficultyOverlay = findViewById<RelativeLayout>(R.id.dialogDifficulty)
         difficultyOverlay.visibility = View.VISIBLE
         
-        findViewById<Button>(R.id.btnEasy).setOnClickListener {
-            difficulty = "easy"
-            vsRobot = true
-            totalPlayers = 2
-            difficultyOverlay.visibility = View.GONE
-            initGame(3)
-        }
+        findViewById<Button>(R.id.btnEasy).setOnClickListener { startBotGame("easy") }
+        findViewById<Button>(R.id.btnNormal).setOnClickListener { startBotGame("normal") }
+        findViewById<Button>(R.id.btnHard).setOnClickListener { startBotGame("hard") }
+    }
 
-        findViewById<Button>(R.id.btnNormal).setOnClickListener {
-            difficulty = "normal"
-            vsRobot = true
-            totalPlayers = 2
-            difficultyOverlay.visibility = View.GONE
-            initGame(3)
-        }
-
-        findViewById<Button>(R.id.btnHard).setOnClickListener {
-            difficulty = "hard"
-            vsRobot = true
-            totalPlayers = 2
-            difficultyOverlay.visibility = View.GONE
-            initGame(3)
-        }
+    private fun startBotGame(level: String) {
+        difficulty = level
+        vsRobot = true
+        totalPlayers = 2
+        findViewById<RelativeLayout>(R.id.dialogDifficulty).visibility = View.GONE
+        initGame(3)
     }
 
     private fun showPlayerCountOverlay() {
         val dialogOverlay = findViewById<RelativeLayout>(R.id.dialogPlayerCount)
         dialogOverlay.visibility = View.VISIBLE
         
-        findViewById<Button>(R.id.btnOpt2).setOnClickListener {
+        findViewById<Button>(R.id.btnOpt2).setOnClickListener { 
             dialogOverlay.visibility = View.GONE
             totalPlayers = 2
-            initGame(3)
+            initGame(3) 
         }
-
-        findViewById<Button>(R.id.btnOpt4).setOnClickListener {
+        findViewById<Button>(R.id.btnOpt4).setOnClickListener { 
             dialogOverlay.visibility = View.GONE
             totalPlayers = 4
-            initGame(6)
+            initGame(6) 
         }
-
-        findViewById<Button>(R.id.btnOpt6).setOnClickListener {
+        findViewById<Button>(R.id.btnOpt6).setOnClickListener { 
             dialogOverlay.visibility = View.GONE
             totalPlayers = 6
-            initGame(10)
+            initGame(10) 
         }
     }
 
@@ -183,11 +167,7 @@ class MainActivity : AppCompatActivity() {
         currentBoardSize = size
         board = Array(size) { arrayOfNulls<String>(size) }
         currentPlayerIndex = 0
-        isTenseMode = false
         
-        hellOverlay.visibility = View.GONE
-        hellOverlay.clearAnimation()
-
         viewFlipper.displayedChild = 4 
         startBGM(R.raw.backsound) 
 
@@ -208,7 +188,7 @@ class MainActivity : AppCompatActivity() {
                     layoutParams = params
                     
                     text = ""
-                    textSize = if (size >= 10) 10f else 22f
+                    textSize = if (size >= 10) 12f else 22f
                     setTextColor(Color.WHITE)
                     setBackgroundResource(R.drawable.grid_item_bg) 
                     setOnClickListener { handleMove(this, i, j) }
@@ -251,13 +231,11 @@ class MainActivity : AppCompatActivity() {
         currentPlayerIndex = (currentPlayerIndex + 1) % totalPlayers
         updateTurnUI()
 
-        // Robot jalan jika mode VS Robot dan gilirannya
         if (vsRobot && currentPlayerIndex == 1) {
             gameGrid.postDelayed({ robotMove() }, 600)
         }
     }
 
-    // UPDATE: Logika Robot berdasarkan Difficulty
     private fun robotMove() {
         val emptyCells = mutableListOf<Pair<Int, Int>>()
         for (i in 0 until currentBoardSize) {
@@ -270,8 +248,8 @@ class MainActivity : AppCompatActivity() {
 
         var move: Pair<Int, Int> = emptyCells.random()
 
-        if (difficulty == "hard" || difficulty == "normal") {
-            // Logika blokir player (Cek apakah player mau menang)
+        if (difficulty != "easy") {
+            // Logika Blokir Player
             val playerSymbol = playerSymbols[0]
             for (cell in emptyCells) {
                 board[cell.first][cell.second] = playerSymbol
@@ -283,7 +261,7 @@ class MainActivity : AppCompatActivity() {
                 board[cell.first][cell.second] = null
             }
             
-            // Logika cari kemenangan sendiri (Hanya di Hard)
+            // Logika Menang Sendiri (Hard)
             if (difficulty == "hard") {
                 val botSymbol = playerSymbols[1]
                 for (cell in emptyCells) {
@@ -385,7 +363,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun startBGM(resId: Int) {
         try {
-            bgmPlayer?.stop()
             bgmPlayer?.release()
             bgmPlayer = MediaPlayer.create(this, resId)
             bgmPlayer?.isLooping = true
@@ -395,7 +372,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopBGM() {
         bgmPlayer?.let {
-            it.stop()
+            if (it.isPlaying) it.stop()
             it.release()
         }
         bgmPlayer = null
